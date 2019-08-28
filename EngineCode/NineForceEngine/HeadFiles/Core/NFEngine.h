@@ -3,9 +3,10 @@
 #include "NFInput.h"
 #include "NFRender.h"
 
+
 namespace NineForceEngine
 {
-    class NFEngine final
+    class NFEngine
     {
     public:
 
@@ -15,13 +16,23 @@ namespace NineForceEngine
         ~NFEngine();
 
 
-        bool Init() const;
+        bool Init();
 
 
         bool Update() const;
 
 
+        void Clean();
+
+
+        LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
+
+
     private:
+
+
+        bool mIsShutDown = false;
+
 
         NFInput* mInput = nullptr;
 

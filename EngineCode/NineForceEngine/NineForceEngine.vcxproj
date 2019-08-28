@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="HeadFiles\Core\NFInclude.h" />
     <ClInclude Include="HeadFiles\Core\NFInput.h" />
+    <ClInclude Include="HeadFiles\Core\NFInterface.h" />
     <ClInclude Include="HeadFiles\Core\NFRender.h" />
     <ClInclude Include="HeadFiles\Core\NFEngine.h" />
   </ItemGroup>

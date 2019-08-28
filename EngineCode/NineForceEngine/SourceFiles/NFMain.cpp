@@ -1,6 +1,7 @@
-#include "Core\NFEngine.h"
+#include "Core/NFEngine.h"
 
 using namespace NineForceEngine;
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
@@ -18,6 +19,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
             break;
         }
     }
+
+    _system->Clean();
+
+    delete _system;
+
+    _system = nullptr;
 
     return 0;
 }

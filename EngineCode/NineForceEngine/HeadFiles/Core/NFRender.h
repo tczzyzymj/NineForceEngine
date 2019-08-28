@@ -8,14 +8,22 @@ namespace NineForceEngine
     {
     public:
         explicit NFRender();
-        
 
-        ~NFRender() ;
+
+        ~NFRender();
 
 
         bool Init() const;
 
 
+        void Update(float deltaTime);
+
+
+        void Clean();
+
+
     private:
+
+        void Render();
     };
 }

@@ -47,5 +47,8 @@
     <ClInclude Include="HeadFiles\Core\NFEngine.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="HeadFiles\Core\NFInterface.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
