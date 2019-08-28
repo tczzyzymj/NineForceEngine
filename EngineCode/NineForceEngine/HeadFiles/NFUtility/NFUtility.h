@@ -4,35 +4,36 @@
 
 namespace NineForceEngine
 {
-    template <class T> class NFSingleton
+    template <typename T> class NFSingleton
     {
     public:
-        static T* Ins()
+        static T* Instance() noexcept(std::is_nothrow_constructible<T>::value)
         {
-            return mIns;
+            static T* _instance = new T();
+
+            return _instance;
         }
 
 
-    private:
+        virtual ~NFSingleton() noexcept
+        {
+        }
+
+
+    protected:
         NFSingleton()
+        {
+        }
+
+
+        explicit NFSingleton(const NFSingleton& other)
         {
         }
 
 
         NFSingleton& operator =(const NFSingleton& other)
         {
-            return other;
+            return {};
         }
-
-
-        NFSingleton(const NFSingleton& other)
-        {
-        }
-
-
-        static T* mIns;
     };
-
-
-    template <class T> T* NFSingleton<T>::mIns = new T;
 }

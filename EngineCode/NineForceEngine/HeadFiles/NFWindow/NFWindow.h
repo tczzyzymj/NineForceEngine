@@ -17,12 +17,22 @@ namespace NineForceEngine
         ~NFWindow();
 
 
-        bool Init();
+        bool Init(int screenWidth, int screenHeight);
 
 
         LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
 
 
+        static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
+
+
     private:
+        HINSTANCE mHandleInstance;
+
+
+        HWND mHwnd;
+
+
+        LPCWSTR m_applicationName = nullptr;
     };
 }

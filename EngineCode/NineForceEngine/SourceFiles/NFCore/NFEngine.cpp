@@ -1,4 +1,5 @@
 #include "NFCore/NFEngine.h"
+#include "NFUtility/NFGlobalConfig.h"
 
 
 NineForceEngine::NFEngine::NFEngine()
@@ -23,7 +24,9 @@ bool NineForceEngine::NFEngine::Init()
         return true;
     }
 
-    if (!mWindow->Init())
+    const auto _globalIns = NFGlobalConfig::Instance();
+
+    if (!mWindow->Init(_globalIns->GetScreenHeight(), _globalIns->GetScreenWidth()))
     {
         return false;
     }

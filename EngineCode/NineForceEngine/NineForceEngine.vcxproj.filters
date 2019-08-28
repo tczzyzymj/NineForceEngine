@@ -28,6 +28,9 @@
     <Filter Include="Header Files\NFUtility">
       <UniqueIdentifier>{8811d236-a2bb-4b16-8552-52f3ffa1c2de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\NFUtility">
+      <UniqueIdentifier>{392cb6cf-88a8-475c-8b51-a7e44ff9c5eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SourceFiles\NFMain.cpp">
@@ -44,6 +47,9 @@
     </ClCompile>
     <ClCompile Include="SourceFiles\NFWindow\NFWindow.cpp">
       <Filter>Source Files\NFWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\NFUtility\NFGlobalConfig.cpp">
+      <Filter>Source Files\NFUtility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

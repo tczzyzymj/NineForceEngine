@@ -42,7 +42,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -138,6 +138,7 @@
     <ClCompile Include="SourceFiles\NFCore\NFInput.cpp" />
     <ClCompile Include="SourceFiles\NFCore\NFRender.cpp" />
     <ClCompile Include="SourceFiles\NFMain.cpp" />
+    <ClCompile Include="SourceFiles\NFUtility\NFGlobalConfig.cpp" />
     <ClCompile Include="SourceFiles\NFWindow\NFWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
