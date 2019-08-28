@@ -4,14 +4,13 @@
 
 namespace NineForceEngine
 {
-    class NFSystem final
+    class NFRender final
     {
     public:
+        explicit NFRender();
+        
 
-        explicit NFSystem();
-
-
-        ~NFSystem();
+        ~NFRender() ;
 
 
     private:

@@ -1,17 +1,15 @@
 #pragma once
 #include "CoreInclude.h"
 
-
 namespace NineForceEngine
 {
-    class NFSystem final
+    class NFInput
     {
     public:
-
-        explicit NFSystem();
-
-
-        ~NFSystem();
+        explicit NFInput();
+        
+        
+        ~NFInput();
 
 
     private:

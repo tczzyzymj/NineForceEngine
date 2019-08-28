@@ -134,9 +134,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SourceFiles\Core\NFInput.cpp" />
+    <ClCompile Include="SourceFiles\Core\NFRender.cpp" />
+    <ClCompile Include="SourceFiles\Core\NFSystem.cpp" />
     <ClCompile Include="SourceFiles\NFMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="HeadFiles\Core\CoreInclude.h" />
+    <ClInclude Include="HeadFiles\Core\NFInput.h" />
+    <ClInclude Include="HeadFiles\Core\NFRender.h" />
     <ClInclude Include="HeadFiles\Core\NFSystem.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
