@@ -1,4 +1,4 @@
-#include "Core/NFRender.h"
+#include "NFCore/NFRender.h"
 
 
 NineForceEngine::NFRender::NFRender()
@@ -11,7 +11,7 @@ NineForceEngine::NFRender::~NFRender()
 }
 
 
-bool NineForceEngine::NFRender::Init() const
+bool NineForceEngine::NFRender::Init()
 {
     return true;
 }

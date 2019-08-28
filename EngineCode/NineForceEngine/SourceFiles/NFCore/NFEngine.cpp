@@ -1,8 +1,13 @@
-#include "Core\NFEngine.h"
+#include "NFCore/NFEngine.h"
 
 
 NineForceEngine::NFEngine::NFEngine()
 {
+    mInput = new NFInput();
+
+    mRender = new NFRender();
+
+    mWindow = new NFWindow();
 }
 
 
@@ -18,9 +23,20 @@ bool NineForceEngine::NFEngine::Init()
         return true;
     }
 
-    mInput = new NFInput();
+    if (!mWindow->Init())
+    {
+        return false;
+    }
 
-    mRender = new NFRender();
+    if (!mInput->Init())
+    {
+        return false;
+    }
+
+    if (!mRender->Init())
+    {
+        return false;
+    }
 
     mHasInit = true;
 
@@ -69,10 +85,4 @@ void NineForceEngine::NFEngine::Clean()
 
         mInput = nullptr;
     }
-}
-
-
-LRESULT NineForceEngine::NFEngine::MessageHandler(HWND, UINT, WPARAM, LPARAM)
-{
-    return LRESULT();
 }

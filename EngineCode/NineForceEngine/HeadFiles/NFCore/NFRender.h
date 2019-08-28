@@ -13,7 +13,7 @@ namespace NineForceEngine
         ~NFRender();
 
 
-        bool Init() const;
+        bool Init();
 
 
         void Update(float deltaTime);

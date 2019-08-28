@@ -1,4 +1,4 @@
-#include "Core\NFInput.h"
+#include "NFCore\NFInput.h"
 
 
 NineForceEngine::NFInput::NFInput()

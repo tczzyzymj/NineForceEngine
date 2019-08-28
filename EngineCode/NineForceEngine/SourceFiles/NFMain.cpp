@@ -1,4 +1,6 @@
-#include "Core/NFEngine.h"
+#include "NFCore/NFEngine.h"
+#include "NFUtility/NFGlobalConfig.h"
+
 
 using namespace NineForceEngine;
 
@@ -20,6 +22,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
         }
     }
 
+    auto _ins = NFSingleton<NFGlobalConfig>::Ins();
+    
     _system->Clean();
 
     delete _system;

@@ -2,6 +2,7 @@
 #include "NFInclude.h"
 #include "NFInput.h"
 #include "NFRender.h"
+#include "NFWindow/NFWindow.h"
 
 
 namespace NineForceEngine
@@ -25,9 +26,6 @@ namespace NineForceEngine
         void Clean();
 
 
-        LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
-
-
     private:
 
 
@@ -38,6 +36,9 @@ namespace NineForceEngine
 
 
         NFRender* mRender = nullptr;
+
+
+        NFWindow* mWindow = nullptr;
 
 
         bool mHasInit = false;
