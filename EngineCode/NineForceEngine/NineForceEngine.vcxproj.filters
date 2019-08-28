@@ -16,7 +16,7 @@
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{30a901a4-8169-4519-af53-24ef480d650a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Core">
+    <Filter Include="Source Files\Core">
       <UniqueIdentifier>{34060d5d-9336-4266-add6-830ba204396f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -24,27 +24,27 @@
     <ClCompile Include="SourceFiles\NFMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\Core\NFSystem.cpp">
-      <Filter>Resource Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="SourceFiles\Core\NFRender.cpp">
-      <Filter>Resource Files\Core</Filter>
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\Core\NFInput.cpp">
-      <Filter>Resource Files\Core</Filter>
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Core\NFEngine.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HeadFiles\Core\NFSystem.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="HeadFiles\Core\CoreInclude.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="HeadFiles\Core\NFInput.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="HeadFiles\Core\NFRender.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\Core\NFInclude.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\Core\NFEngine.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>

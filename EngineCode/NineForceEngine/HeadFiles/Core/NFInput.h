@@ -1,5 +1,5 @@
 #pragma once
-#include "CoreInclude.h"
+#include "NFInclude.h"
 
 namespace NineForceEngine
 {

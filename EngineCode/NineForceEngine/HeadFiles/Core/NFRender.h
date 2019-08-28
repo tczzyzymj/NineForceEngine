@@ -1,5 +1,5 @@
 #pragma once
-#include "CoreInclude.h"
+#include "NFInclude.h"
 
 
 namespace NineForceEngine
@@ -11,6 +11,9 @@ namespace NineForceEngine
         
 
         ~NFRender() ;
+
+
+        bool Init() const;
 
 
     private:

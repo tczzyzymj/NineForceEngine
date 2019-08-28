@@ -5,14 +5,14 @@
 
 namespace NineForceEngine
 {
-    class NFSystem final
+    class NFEngine final
     {
     public:
 
-        explicit NFSystem();
+        explicit NFEngine();
 
 
-        ~NFSystem();
+        ~NFEngine();
 
 
         bool Init() const;
