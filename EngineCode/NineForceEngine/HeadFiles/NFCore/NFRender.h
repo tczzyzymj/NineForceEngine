@@ -32,5 +32,8 @@ namespace NineForceEngine
 
 
         ID3D11DeviceContext* mContext = nullptr;
+
+
+		IDXGISwapChain* mSwapChain = nullptr;
     };
 }
