@@ -83,6 +83,11 @@ bool NineForceEngine::NFWindow::Init()
 }
 
 
+void NineForceEngine::NFWindow::OnResize()
+{
+}
+
+
 LRESULT NineForceEngine::NFWindow::MessageHandler(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -151,21 +156,31 @@ bool NineForceEngine::NFWindow::InitWindow()
     mApplicationName = L"NineForceEngine";
 
     // Setup the windows class with default settings.
-    _wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+    _wc.style = CS_HREDRAW | CS_VREDRAW;
     _wc.lpfnWndProc = WndProc;
     _wc.cbClsExtra = 0;
     _wc.cbWndExtra = 0;
     _wc.hInstance = mHandleInstance;
-    _wc.hIcon = LoadIcon(nullptr, IDI_WINLOGO);
+    _wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
     _wc.hIconSm = _wc.hIcon;
     _wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    _wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
+    _wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(GRAY_BRUSH));
     _wc.lpszMenuName = nullptr;
     _wc.lpszClassName = mApplicationName;
     _wc.cbSize = sizeof(WNDCLASSEX);
 
     // Register the window class.
-    RegisterClassEx(&_wc);
+    if (!RegisterClassEx(&_wc))
+    {
+        MessageBox(
+            nullptr,
+            L"Register window class failed!",
+            nullptr,
+            0
+        );
+
+        return false;
+    }
 
     // Determine the resolution of the clients desktop screen.
     auto _screenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -204,7 +219,8 @@ bool NineForceEngine::NFWindow::InitWindow()
         WS_EX_APPWINDOW,
         mApplicationName,
         mApplicationName,
-        WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
+        WS_OVERLAPPEDWINDOW,
+        // | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
         _posX,
         _posY,
         _screenWidth,
@@ -218,12 +234,11 @@ bool NineForceEngine::NFWindow::InitWindow()
     // Bring the window up on the screen and set it as main focus.
     ShowWindow(mHwnd, SW_SHOW);
 
+    UpdateWindow(mHwnd);
+
     SetForegroundWindow(mHwnd);
 
     SetFocus(mHwnd);
-
-    // Hide the mouse cursor.
-    ShowCursor(false);
 
     return true;
 }

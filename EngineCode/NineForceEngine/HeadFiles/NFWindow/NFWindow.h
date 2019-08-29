@@ -20,6 +20,12 @@ namespace NineForceEngine
         bool Init();
 
 
+        /*
+         * on window resize, need change the graphic
+         */
+        void OnResize();
+
+
         void Update(float deltaTime);
 
 

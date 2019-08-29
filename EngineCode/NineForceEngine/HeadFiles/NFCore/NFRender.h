@@ -1,5 +1,6 @@
 #pragma once
 #include "NFInclude.h"
+#include <d3d11.h>
 
 
 namespace NineForceEngine
@@ -25,5 +26,11 @@ namespace NineForceEngine
     private:
 
         void Render();
+
+
+        ID3D11Device* mDevice = nullptr;
+
+
+        ID3D11DeviceContext* mContext = nullptr;
     };
 }
