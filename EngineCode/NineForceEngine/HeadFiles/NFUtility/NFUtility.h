@@ -4,7 +4,7 @@
 
 namespace NineForceEngine
 {
-    template <typename T> class NFSingleton
+    template <class T> class NFSingleton
     {
     public:
         static T* Instance() noexcept(std::is_nothrow_constructible<T>::value)
@@ -21,7 +21,7 @@ namespace NineForceEngine
 
 
     protected:
-        NFSingleton()
+        explicit NFSingleton()
         {
         }
 

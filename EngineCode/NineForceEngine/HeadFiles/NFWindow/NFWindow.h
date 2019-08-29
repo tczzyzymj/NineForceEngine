@@ -20,19 +20,31 @@ namespace NineForceEngine
         bool Init(int screenWidth, int screenHeight);
 
 
-        LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
+        void Update(float deltaTime);
 
 
-        static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
+        void Clean();
+
+
+        static LRESULT CALLBACK MessageHandler(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+
+        static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 
     private:
-        HINSTANCE mHandleInstance;
+        HINSTANCE mHandleInstance{};
 
 
-        HWND mHwnd;
+        HWND mHwnd{};
 
 
-        LPCWSTR m_applicationName = nullptr;
+        bool mHasInit = false;
+
+
+        LPCWSTR mApplicationName = nullptr;
+
+
+        bool InitWindow(int screenWidth, int screenHeight);
     };
 }

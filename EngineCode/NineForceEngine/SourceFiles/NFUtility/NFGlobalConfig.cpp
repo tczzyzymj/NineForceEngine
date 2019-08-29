@@ -1,6 +1,18 @@
 #include "NFUtility/NFGlobalConfig.h"
 
 
+bool NineForceEngine::NFGlobalConfig::GetIsRunning() const
+{
+    return mIsRunning;
+}
+
+
+void NineForceEngine::NFGlobalConfig::SetIsRunning(bool targetValue)
+{
+    mIsRunning = targetValue;
+}
+
+
 bool NineForceEngine::NFGlobalConfig::GetIsFullScreen() const
 {
     return mIsFullScreen;

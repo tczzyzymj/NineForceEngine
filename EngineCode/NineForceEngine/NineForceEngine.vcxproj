@@ -89,7 +89,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -98,9 +98,10 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -113,7 +114,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -128,7 +129,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -137,6 +138,7 @@
     <ClCompile Include="SourceFiles\NFCore\NFEngine.cpp" />
     <ClCompile Include="SourceFiles\NFCore\NFInput.cpp" />
     <ClCompile Include="SourceFiles\NFCore\NFRender.cpp" />
+    <ClCompile Include="SourceFiles\NFCore\NFTimer.cpp" />
     <ClCompile Include="SourceFiles\NFMain.cpp" />
     <ClCompile Include="SourceFiles\NFUtility\NFGlobalConfig.cpp" />
     <ClCompile Include="SourceFiles\NFWindow\NFWindow.cpp" />
@@ -147,6 +149,7 @@
     <ClInclude Include="HeadFiles\NFCore\NFInput.h" />
     <ClInclude Include="HeadFiles\NFCore\NFInterface.h" />
     <ClInclude Include="HeadFiles\NFCore\NFRender.h" />
+    <ClInclude Include="HeadFiles\NFCore\NFTimer.h" />
     <ClInclude Include="HeadFiles\NFUtility\NFGlobalConfig.h" />
     <ClInclude Include="HeadFiles\NFUtility\NFUtility.h" />
     <ClInclude Include="HeadFiles\NFWindow\NFWindow.h" />

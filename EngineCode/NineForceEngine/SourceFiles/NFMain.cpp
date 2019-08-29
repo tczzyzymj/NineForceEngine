@@ -1,5 +1,6 @@
 #include "NFCore/NFEngine.h"
 #include "NFUtility/NFGlobalConfig.h"
+#include "NFCore/NFTimer.h"
 
 
 using namespace NineForceEngine;
@@ -7,26 +8,36 @@ using namespace NineForceEngine;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-    auto _system = new NFEngine();
+    auto _engine = new NFEngine();
 
-    if (!_system->Init())
+    if (!_engine->Init())
     {
         return -1;
     }
 
-    while (true)
+    const auto _globalIns = NFGlobalConfig::Instance();
+
+    auto _timerIns = NFTimer::Instance();
+
+    while (_globalIns->GetIsRunning())
     {
-        if (!_system->Update())
+        _timerIns->BeginRecord();
+
+        const auto _result = _engine->Update(_timerIns->GetDeltaTime());
+
+        _timerIns->EndRecord();
+
+        if (!_result)
         {
             break;
         }
     }
 
-    _system->Clean();
+    _engine->Clean();
 
-    delete _system;
+    delete _engine;
 
-    _system = nullptr;
+    _engine = nullptr;
 
     return 0;
 }

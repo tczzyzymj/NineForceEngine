@@ -1,6 +1,5 @@
 #pragma once
 #include "NFInclude.h"
-#include "NFInput.h"
 #include "NFRender.h"
 #include "NFWindow/NFWindow.h"
 
@@ -20,7 +19,7 @@ namespace NineForceEngine
         bool Init();
 
 
-        bool Update() const;
+        bool Update(float deltaTime) const;
 
 
         void Clean();
@@ -32,13 +31,10 @@ namespace NineForceEngine
         bool mIsShutDown = false;
 
 
-        NFInput* mInput = nullptr;
+        NFWindow* mWindow = nullptr;
 
 
         NFRender* mRender = nullptr;
-
-
-        NFWindow* mWindow = nullptr;
 
 
         bool mHasInit = false;

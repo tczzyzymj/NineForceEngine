@@ -12,7 +12,129 @@ NineForceEngine::NFWindow::~NFWindow()
 }
 
 
+void NineForceEngine::NFWindow::Update(float deltaTime)
+{
+    MSG _msg;
+
+    ZeroMemory(&_msg, sizeof(_msg));
+
+    auto _done = false;
+
+    while (!_done)
+    {
+        if (PeekMessage(
+            &_msg,
+            nullptr,
+            0,
+            0,
+            PM_REMOVE))
+        {
+            TranslateMessage(&_msg);
+
+            DispatchMessage(&_msg);
+        }
+
+        if (_msg.message == WM_QUIT)
+        {
+            _done = true;
+
+            NFGlobalConfig::Instance()->SetIsRunning(false);
+        }
+    }
+}
+
+
+void NineForceEngine::NFWindow::Clean()
+{
+    // Show the mouse cursor.
+    ShowCursor(true);
+
+    // Fix the display settings if leaving full screen mode.
+    if (NFGlobalConfig::Instance()->GetIsFullScreen())
+    {
+        ChangeDisplaySettings(nullptr, 0);
+    }
+
+    // Remove the window.
+    DestroyWindow(mHwnd);
+
+    mHwnd = nullptr;
+
+    // Remove the application instance.
+    UnregisterClass(mApplicationName, mHandleInstance);
+
+    mHandleInstance = nullptr;
+
+    // Release the pointer to this class.
+    mApplicationName = nullptr;
+}
+
+
 bool NineForceEngine::NFWindow::Init(int screenWidth, int screenHeight)
+{
+    if (!InitWindow(screenWidth, screenHeight))
+    {
+        return false;
+    }
+
+    mHasInit = true;
+
+    return true;
+}
+
+
+LRESULT NineForceEngine::NFWindow::MessageHandler(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+            // Check if a key has been pressed on the keyboard.
+        case WM_KEYDOWN:
+        {
+            // If a key is pressed send it to the input object so it can record that state.
+            // mInput->KeyDown(static_cast<unsigned int>(wParam));
+
+            return 0;
+        }
+
+            // Check if a key has been released on the keyboard.
+        case WM_KEYUP:
+        {
+            // If a key is released then send it to the input object so it can unset the state for that key.
+            //mInput->KeyUp(static_cast<unsigned int>(wParam));
+
+            return 0;
+        }
+
+
+        default:
+        {
+            // Any other messages send to the default message handler as our application won't make use of them.
+
+            return DefWindowProc(hwnd, message, wParam, lParam);
+        }
+    }
+}
+
+
+LRESULT NineForceEngine::NFWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+    switch (message)
+    {
+        case WM_DESTROY:
+        case WM_CLOSE:
+        {
+            PostQuitMessage(0);
+            return 0;
+        }
+        default:
+        {
+            return MessageHandler(hwnd, message, wparam, lparam);
+        }
+    }
+}
+
+
+bool NineForceEngine::NFWindow::InitWindow(int screenWidth, int screenHeight)
 {
     WNDCLASSEX _wc;
     DEVMODE _dmScreenSettings;
@@ -26,7 +148,7 @@ bool NineForceEngine::NFWindow::Init(int screenWidth, int screenHeight)
     mHandleInstance = GetModuleHandle(nullptr);
 
     // Give the application a name.
-    m_applicationName = L"Engine";
+    mApplicationName = L"NineForceEngine";
 
     // Setup the windows class with default settings.
     _wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
@@ -39,7 +161,7 @@ bool NineForceEngine::NFWindow::Init(int screenWidth, int screenHeight)
     _wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
     _wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
     _wc.lpszMenuName = nullptr;
-    _wc.lpszClassName = m_applicationName;
+    _wc.lpszClassName = mApplicationName;
     _wc.cbSize = sizeof(WNDCLASSEX);
 
     // Register the window class.
@@ -80,8 +202,8 @@ bool NineForceEngine::NFWindow::Init(int screenWidth, int screenHeight)
     // Create the window with the screen settings and get the handle to it.
     mHwnd = CreateWindowEx(
         WS_EX_APPWINDOW,
-        m_applicationName,
-        m_applicationName,
+        mApplicationName,
+        mApplicationName,
         WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
         _posX,
         _posY,
@@ -104,38 +226,4 @@ bool NineForceEngine::NFWindow::Init(int screenWidth, int screenHeight)
     ShowCursor(false);
 
     return true;
-}
-
-
-LRESULT NineForceEngine::NFWindow::MessageHandler(HWND, UINT, WPARAM, LPARAM)
-{
-    return 0;
-}
-
-
-LRESULT NineForceEngine::NFWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
-{
-    switch (message)
-    {
-            // Check if the window is being destroyed.
-        case WM_DESTROY:
-        {
-            PostQuitMessage(0);
-            return 0;
-        }
-
-            // Check if the window is being closed.
-        case WM_CLOSE:
-        {
-            PostQuitMessage(0);
-            return 0;
-        }
-
-            // All other messages pass to the message handler in the system class.
-        default:
-        {
-            return 0;
-            //return ApplicationHandle->MessageHandler(hwnd, message, wparam, lparam);
-        }
-    }
 }

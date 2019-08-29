@@ -31,15 +31,24 @@
     <Filter Include="Source Files\NFUtility">
       <UniqueIdentifier>{392cb6cf-88a8-475c-8b51-a7e44ff9c5eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\NSingleton">
+      <UniqueIdentifier>{cfd63d1b-fd9b-45c4-9695-eb5ac3fc1f66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NFManager">
+      <UniqueIdentifier>{6c17e0fd-228b-4464-b960-abea0c6be7e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NFSingleton">
+      <UniqueIdentifier>{481d2e41-d553-413e-8ef7-74d356d022e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NFManager">
+      <UniqueIdentifier>{3a488a11-9e05-4063-9052-8b1cf5608dd7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SourceFiles\NFMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\NFCore\NFEngine.cpp">
-      <Filter>Source Files\NFCore</Filter>
-    </ClCompile>
-    <ClCompile Include="SourceFiles\NFCore\NFInput.cpp">
       <Filter>Source Files\NFCore</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\NFCore\NFRender.cpp">
@@ -51,15 +60,18 @@
     <ClCompile Include="SourceFiles\NFUtility\NFGlobalConfig.cpp">
       <Filter>Source Files\NFUtility</Filter>
     </ClCompile>
+    <ClCompile Include="SourceFiles\NFCore\NFTimer.cpp">
+      <Filter>Source Files\NFCore</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\NFCore\NFInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HeadFiles\NFCore\NFEngine.h">
       <Filter>Header Files\NFCore</Filter>
     </ClInclude>
     <ClInclude Include="HeadFiles\NFCore\NFInclude.h">
-      <Filter>Header Files\NFCore</Filter>
-    </ClInclude>
-    <ClInclude Include="HeadFiles\NFCore\NFInput.h">
       <Filter>Header Files\NFCore</Filter>
     </ClInclude>
     <ClInclude Include="HeadFiles\NFCore\NFInterface.h">
@@ -76,6 +88,12 @@
     </ClInclude>
     <ClInclude Include="HeadFiles\NFUtility\NFGlobalConfig.h">
       <Filter>Header Files\NFUtility</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\NFCore\NFTimer.h">
+      <Filter>Header Files\NFCore</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\NFCore\NFInput.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

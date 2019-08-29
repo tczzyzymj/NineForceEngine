@@ -7,20 +7,13 @@ namespace NineForceEngine
 {
     class NFGlobalConfig final : public NFSingleton<NFGlobalConfig>
     {
-    private:
-        friend NFSingleton<NFGlobalConfig>;
-
-
-        bool mIsFullScreen = false;
-
-
-        int mScreenWidth = 1366;
-
-
-        int mScreenHeight = 768;
-
-
     public:
+        bool GetIsRunning() const;
+
+
+        void SetIsRunning(bool targetValue);
+
+
         bool GetIsFullScreen() const;
 
 
@@ -37,5 +30,19 @@ namespace NineForceEngine
 
 
         void SetScreenHeight(const int targetHeight);
+
+
+    private:
+               
+        bool mIsFullScreen = false;
+
+
+        int mScreenWidth = 1366;
+
+
+        int mScreenHeight = 768;
+
+
+        bool mIsRunning = false;
     };
 }

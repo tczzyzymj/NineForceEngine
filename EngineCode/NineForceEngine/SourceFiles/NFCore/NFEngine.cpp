@@ -1,11 +1,10 @@
 #include "NFCore/NFEngine.h"
 #include "NFUtility/NFGlobalConfig.h"
+#include "NFCore/NFTimer.h"
 
 
 NineForceEngine::NFEngine::NFEngine()
 {
-    mInput = new NFInput();
-
     mRender = new NFRender();
 
     mWindow = new NFWindow();
@@ -31,23 +30,25 @@ bool NineForceEngine::NFEngine::Init()
         return false;
     }
 
-    if (!mInput->Init())
+    if (!mRender->Init())
     {
         return false;
     }
 
-    if (!mRender->Init())
+    if (!NFTimer::Instance()->Init())
     {
         return false;
     }
 
     mHasInit = true;
 
+    NFGlobalConfig::Instance()->SetIsRunning(true);
+
     return true;
 }
 
 
-bool NineForceEngine::NFEngine::Update() const
+bool NineForceEngine::NFEngine::Update(float deltaTime) const
 {
     if (!mHasInit)
     {
@@ -59,11 +60,9 @@ bool NineForceEngine::NFEngine::Update() const
         return false;
     }
 
-    const auto _deltaTime = 0.033f;
+    mWindow->Update(deltaTime);
 
-    mInput->Update(_deltaTime);
-
-    mRender->Update(_deltaTime);
+    mRender->Update(deltaTime);
 
     return true;
 }
@@ -80,12 +79,12 @@ void NineForceEngine::NFEngine::Clean()
         mRender = nullptr;
     }
 
-    if (mInput != nullptr)
+    if (mWindow != nullptr)
     {
-        mInput->Clean();
+        mWindow->Clean();
 
-        delete mInput;
+        delete mWindow;
 
-        mInput = nullptr;
+        mWindow = nullptr;
     }
 }
