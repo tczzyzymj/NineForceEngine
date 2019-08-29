@@ -70,6 +70,12 @@ void NineForceEngine::NFWindow::Clean()
 }
 
 
+HWND NineForceEngine::NFWindow::GetWindowHandler() const
+{
+    return mHwnd;
+}
+
+
 bool NineForceEngine::NFWindow::Init()
 {
     if (!InitWindow())

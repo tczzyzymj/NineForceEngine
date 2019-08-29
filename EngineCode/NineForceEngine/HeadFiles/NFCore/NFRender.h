@@ -14,7 +14,7 @@ namespace NineForceEngine
         ~NFRender();
 
 
-        bool Init();
+        bool Init(const HWND targetWindow);
 
 
         void Update(float deltaTime);
@@ -25,6 +25,9 @@ namespace NineForceEngine
 
     private:
 
+        void ReleaseCom(IUnknown** targetPtr);
+
+
         void Render();
 
 
@@ -34,6 +37,9 @@ namespace NineForceEngine
         ID3D11DeviceContext* mContext = nullptr;
 
 
-		IDXGISwapChain* mSwapChain = nullptr;
+        IDXGISwapChain* mSwapChain = nullptr;
+
+
+        UINT m4XMSAAQuality = 0;
     };
 }

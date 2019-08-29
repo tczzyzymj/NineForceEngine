@@ -47,3 +47,27 @@ void NineForceEngine::NFGlobalConfig::SetScreenHeight(const int targetHeight)
 {
     mScreenHeight = targetHeight;
 }
+
+
+int NineForceEngine::NFGlobalConfig::GetRefreshRate() const
+{
+    return mRefreshRate;
+}
+
+
+void NineForceEngine::NFGlobalConfig::SetRefreshRate(int targetValue)
+{
+    mRefreshRate = targetValue;
+}
+
+
+bool NineForceEngine::NFGlobalConfig::GetUse4XMSAA() const
+{
+    return mUse4XMSAA;
+}
+
+
+void NineForceEngine::NFGlobalConfig::SetUse4XMSAA(bool targetValue)
+{
+    mUse4XMSAA = targetValue;
+}

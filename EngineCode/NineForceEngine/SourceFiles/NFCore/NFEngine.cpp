@@ -28,7 +28,7 @@ bool NineForceEngine::NFEngine::Init()
         return false;
     }
 
-    if (!mRender->Init())
+    if (!mRender->Init(mWindow->GetWindowHandler()))
     {
         return false;
     }

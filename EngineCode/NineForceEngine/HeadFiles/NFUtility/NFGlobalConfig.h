@@ -32,8 +32,20 @@ namespace NineForceEngine
         void SetScreenHeight(const int targetHeight);
 
 
+        int GetRefreshRate() const;
+
+
+        void SetRefreshRate(int targetValue);
+
+
+        bool GetUse4XMSAA() const;
+
+
+        void SetUse4XMSAA(bool targetValue);
+
+
     private:
-               
+
         bool mIsFullScreen = false;
 
 
@@ -44,5 +56,11 @@ namespace NineForceEngine
 
 
         bool mIsRunning = false;
+
+
+        int mRefreshRate = 60;
+
+
+        bool mUse4XMSAA = true;
     };
 }

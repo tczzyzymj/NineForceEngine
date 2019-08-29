@@ -32,6 +32,9 @@ namespace NineForceEngine
         void Clean();
 
 
+        HWND GetWindowHandler() const;
+
+
         static LRESULT CALLBACK MessageHandler(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 
