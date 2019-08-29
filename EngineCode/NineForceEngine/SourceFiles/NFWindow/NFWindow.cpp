@@ -70,9 +70,9 @@ void NineForceEngine::NFWindow::Clean()
 }
 
 
-bool NineForceEngine::NFWindow::Init(int screenWidth, int screenHeight)
+bool NineForceEngine::NFWindow::Init()
 {
-    if (!InitWindow(screenWidth, screenHeight))
+    if (!InitWindow())
     {
         return false;
     }
@@ -134,7 +134,7 @@ LRESULT NineForceEngine::NFWindow::WndProc(HWND hwnd, UINT message, WPARAM wpara
 }
 
 
-bool NineForceEngine::NFWindow::InitWindow(int screenWidth, int screenHeight)
+bool NineForceEngine::NFWindow::InitWindow()
 {
     WNDCLASSEX _wc;
     DEVMODE _dmScreenSettings;
@@ -168,8 +168,8 @@ bool NineForceEngine::NFWindow::InitWindow(int screenWidth, int screenHeight)
     RegisterClassEx(&_wc);
 
     // Determine the resolution of the clients desktop screen.
-    screenWidth = GetSystemMetrics(SM_CXSCREEN);
-    screenHeight = GetSystemMetrics(SM_CYSCREEN);
+    auto _screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    auto _screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
     // Setup the screen settings depending on whether it is running in full screen or in windowed mode.
     if (NFGlobalConfig::Instance()->GetIsFullScreen())
@@ -177,8 +177,8 @@ bool NineForceEngine::NFWindow::InitWindow(int screenWidth, int screenHeight)
         // If full screen set the screen to maximum size of the users desktop and 32bit.
         memset(&_dmScreenSettings, 0, sizeof(_dmScreenSettings));
         _dmScreenSettings.dmSize = sizeof(_dmScreenSettings);
-        _dmScreenSettings.dmPelsWidth = static_cast<unsigned long>(screenWidth);
-        _dmScreenSettings.dmPelsHeight = static_cast<unsigned long>(screenHeight);
+        _dmScreenSettings.dmPelsWidth = static_cast<unsigned long>(_screenWidth);
+        _dmScreenSettings.dmPelsHeight = static_cast<unsigned long>(_screenHeight);
         _dmScreenSettings.dmBitsPerPel = 32;
         _dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
@@ -191,12 +191,12 @@ bool NineForceEngine::NFWindow::InitWindow(int screenWidth, int screenHeight)
     else
     {
         // If windowed then set it to 800x600 resolution.
-        screenWidth = 800;
-        screenHeight = 600;
+        _screenWidth = NFGlobalConfig::Instance()->GetScreenWidth();
+        _screenHeight = NFGlobalConfig::Instance()->GetScreenHeight();
 
         // Place the window in the middle of the screen.
-        _posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
-        _posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
+        _posX = (GetSystemMetrics(SM_CXSCREEN) - _screenWidth) / 2;
+        _posY = (GetSystemMetrics(SM_CYSCREEN) - _screenHeight) / 2;
     }
 
     // Create the window with the screen settings and get the handle to it.
@@ -207,8 +207,8 @@ bool NineForceEngine::NFWindow::InitWindow(int screenWidth, int screenHeight)
         WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
         _posX,
         _posY,
-        screenWidth,
-        screenHeight,
+        _screenWidth,
+        _screenHeight,
         nullptr,
         nullptr,
         mHandleInstance,

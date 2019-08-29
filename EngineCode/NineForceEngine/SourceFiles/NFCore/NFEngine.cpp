@@ -23,9 +23,7 @@ bool NineForceEngine::NFEngine::Init()
         return true;
     }
 
-    const auto _globalIns = NFGlobalConfig::Instance();
-
-    if (!mWindow->Init(_globalIns->GetScreenHeight(), _globalIns->GetScreenWidth()))
+    if (!mWindow->Init())
     {
         return false;
     }

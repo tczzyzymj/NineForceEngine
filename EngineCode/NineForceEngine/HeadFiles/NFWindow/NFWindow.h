@@ -17,7 +17,7 @@ namespace NineForceEngine
         ~NFWindow();
 
 
-        bool Init(int screenWidth, int screenHeight);
+        bool Init();
 
 
         void Update(float deltaTime);
@@ -45,6 +45,6 @@ namespace NineForceEngine
         LPCWSTR mApplicationName = nullptr;
 
 
-        bool InitWindow(int screenWidth, int screenHeight);
+        bool InitWindow();
     };
 }
