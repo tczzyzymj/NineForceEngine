@@ -25,9 +25,6 @@ namespace NineForceEngine
 
     private:
 
-        void ReleaseCom(IUnknown** targetPtr);
-
-
         void Render();
 
 
@@ -38,6 +35,12 @@ namespace NineForceEngine
 
 
         IDXGISwapChain* mSwapChain = nullptr;
+
+
+        ID3D11DepthStencilView* mDepthStencilView = nullptr;
+
+
+        ID3D11RenderTargetView* mRenderTargetView = nullptr;
 
 
         UINT m4XMSAAQuality = 0;

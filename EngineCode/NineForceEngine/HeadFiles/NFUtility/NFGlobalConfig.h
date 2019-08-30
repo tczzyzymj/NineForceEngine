@@ -1,6 +1,6 @@
 #pragma once
 #include "NFCore/NFInclude.h"
-#include "NFUtility/NFUtility.h"
+#include "NFCore/NFSingleton.h"
 
 
 namespace NineForceEngine
@@ -20,16 +20,16 @@ namespace NineForceEngine
         void SetIsFullScreen(bool targetValue);
 
 
-        int GetScreenWidth() const;
+        int GetResolutionWidth() const;
 
 
-        void SetScreenWidth(const int targetWidth);
+        void SetResolutionWidth(const int targetWidth);
 
 
-        int GetScreenHeight() const;
+        int GetResolutionHeight() const;
 
 
-        void SetScreenHeight(const int targetHeight);
+        void SetResolutionHeight(const int targetHeight);
 
 
         int GetRefreshRate() const;
@@ -49,10 +49,10 @@ namespace NineForceEngine
         bool mIsFullScreen = false;
 
 
-        int mScreenWidth = 1366;
+        int mResolutionWidth = 1366;
 
 
-        int mScreenHeight = 768;
+        int mResolutionHeight = 768;
 
 
         bool mIsRunning = false;

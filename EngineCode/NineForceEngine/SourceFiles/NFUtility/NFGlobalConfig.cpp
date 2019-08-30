@@ -25,27 +25,27 @@ void NineForceEngine::NFGlobalConfig::SetIsFullScreen(const bool targetValue)
 }
 
 
-int NineForceEngine::NFGlobalConfig::GetScreenWidth() const
+int NineForceEngine::NFGlobalConfig::GetResolutionWidth() const
 {
-    return mScreenWidth;
+    return mResolutionWidth;
 }
 
 
-void NineForceEngine::NFGlobalConfig::SetScreenWidth(const int targetWidth)
+void NineForceEngine::NFGlobalConfig::SetResolutionWidth(const int targetWidth)
 {
-    mScreenWidth = targetWidth;
+    mResolutionWidth = targetWidth;
 }
 
 
-int NineForceEngine::NFGlobalConfig::GetScreenHeight() const
+int NineForceEngine::NFGlobalConfig::GetResolutionHeight() const
 {
-    return mScreenHeight;
+    return mResolutionHeight;
 }
 
 
-void NineForceEngine::NFGlobalConfig::SetScreenHeight(const int targetHeight)
+void NineForceEngine::NFGlobalConfig::SetResolutionHeight(const int targetHeight)
 {
-    mScreenHeight = targetHeight;
+    mResolutionHeight = targetHeight;
 }
 
 

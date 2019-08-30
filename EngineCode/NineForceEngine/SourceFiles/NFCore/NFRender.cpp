@@ -15,13 +15,20 @@ NineForceEngine::NFRender::~NFRender()
 
 bool NineForceEngine::NFRender::Init(const HWND targetWindow)
 {
+    // create device
+    UINT _createDeviceFlags = 0;
+
+#if defined(DEBUG) || defined(_DEBUF)
+    _createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
     D3D_FEATURE_LEVEL _featureLevel;
 
     auto _result = D3D11CreateDevice(
         nullptr,
         D3D_DRIVER_TYPE_HARDWARE,
         nullptr,
-        0,
+        _createDeviceFlags,
         nullptr,
         0,
         D3D11_SDK_VERSION,
@@ -43,6 +50,7 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
 
         return false;
     }
+    // end
 
 
     // check 4x msaa support
@@ -53,6 +61,18 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
         &m4XMSAAQuality
     );
 
+    if (FAILED(_result))
+    {
+        MessageBox(
+            nullptr,
+            L"Check 4XMSAA failed! please check!",
+            L"Error",
+            0
+        );
+
+        return false;
+    }
+
     assert(m4XMSAAQuality > 0);
 
     // end
@@ -62,9 +82,9 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
 
     DXGI_SWAP_CHAIN_DESC _swapChainDesc;
 
-    _swapChainDesc.BufferDesc.Width = _globalIns->GetScreenWidth();
+    _swapChainDesc.BufferDesc.Width = _globalIns->GetResolutionWidth();
 
-    _swapChainDesc.BufferDesc.Height = _globalIns->GetScreenHeight();
+    _swapChainDesc.BufferDesc.Height = _globalIns->GetResolutionHeight();
 
     _swapChainDesc.BufferDesc.RefreshRate.Numerator = _globalIns->GetRefreshRate();
 
@@ -159,13 +179,123 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
         return false;
     }
 
-    ReleaseCom(reinterpret_cast<IUnknown**>(_dxgiFactory));
+    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(_dxgiFactory));
 
-    ReleaseCom(reinterpret_cast<IUnknown**>(_dxgiAdapter));
+    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(_dxgiAdapter));
 
-    ReleaseCom(reinterpret_cast<IUnknown**>(_dxgiDevice));
+    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(_dxgiDevice));
 
     //end
+
+    // create Render target view
+    ID3D11Texture2D* _backBuffer = nullptr;
+
+    mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&_backBuffer));
+
+    if (_backBuffer != nullptr)
+    {
+        _result = mDevice->CreateRenderTargetView(_backBuffer, nullptr, &mRenderTargetView);
+
+        if (FAILED(_result))
+        {
+            MessageBox(
+                nullptr,
+                L"Create render target view faild! please check!",
+                L"Error",
+                0
+            );
+
+            return false;
+        }
+    }
+    else
+    {
+        MessageBox(
+            nullptr,
+            L"Get back buffer failed! please check!",
+            L"Error",
+            0
+        );
+
+
+        return false;
+    }
+
+    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(_backBuffer));
+
+    // end
+
+
+    // create Depth/Stencil buffer and view
+
+    D3D11_TEXTURE2D_DESC _depthStencilDesc;
+
+    _depthStencilDesc.Width = NFGlobalConfig::Instance()->GetResolutionWidth();
+
+    _depthStencilDesc.Height = NFGlobalConfig::Instance()->GetResolutionHeight();
+
+    _depthStencilDesc.MipLevels = 1;
+
+    _depthStencilDesc.ArraySize = 1;
+
+    _depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+
+    _depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+    _depthStencilDesc.CPUAccessFlags = 0; // no cpu access, it's a slow opration,should avoid
+
+    _depthStencilDesc.MiscFlags = 0;
+
+    ID3D11Texture2D* _depthStencilBuffer = nullptr;
+
+    _result = mDevice->CreateTexture2D(&_depthStencilDesc, nullptr, &_depthStencilBuffer);
+
+    if (FAILED(_result))
+    {
+        MessageBox(
+            nullptr,
+            L"Create depth & stencil buffer failed, please check!",
+            L"Error",
+            0
+        );
+
+        return false;
+    }
+
+    _result = mDevice->CreateDepthStencilView(_depthStencilBuffer, nullptr, &mDepthStencilView);
+
+    if (FAILED(_result))
+    {
+        MessageBox(
+            nullptr,
+            L"Create depth & stencil buffer view failed! please check!",
+            L"Error",
+            0
+        );
+
+        return false;
+    }
+
+    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(_depthStencilBuffer));
+
+    // end
+
+    mContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
+
+
+    // set viewport
+    D3D11_VIEWPORT _viewPort;
+
+    _viewPort.TopLeftX = 0;
+    _viewPort.TopLeftY = 0;
+    _viewPort.Width = static_cast<float>(NFGlobalConfig::Instance()->GetResolutionWidth());
+    _viewPort.Height = static_cast<float>(NFGlobalConfig::Instance()->GetResolutionHeight());
+    _viewPort.MinDepth = 0.0f;
+    _viewPort.MaxDepth = 1.0f;
+
+    mContext->RSSetViewports(1, &_viewPort);
+
+    // end
 
     return true;
 }
@@ -178,19 +308,6 @@ void NineForceEngine::NFRender::Update(float deltaTime)
 
 void NineForceEngine::NFRender::Clean()
 {
-}
-
-
-void NineForceEngine::NFRender::ReleaseCom(IUnknown** targetPtr)
-{
-    if (targetPtr == nullptr || *targetPtr == nullptr)
-    {
-        return;
-    }
-
-    (*targetPtr)->Release();
-
-    *targetPtr = nullptr;
 }
 
 

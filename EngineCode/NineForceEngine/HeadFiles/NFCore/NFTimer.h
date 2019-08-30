@@ -1,5 +1,6 @@
 #pragma once
 #include "NFUtility/NFUtility.h"
+#include "NFSingleton.h"
 
 
 namespace NineForceEngine
@@ -23,6 +24,7 @@ namespace NineForceEngine
 
         friend class NFSingleton<NFTimer>;
 
+
         NFTimer() = default;
 
 
@@ -30,5 +32,8 @@ namespace NineForceEngine
 
 
         long mBeginRecordTime = 0;
+
+
+        double mSecondsPerTime = 0.0;
     };
 }

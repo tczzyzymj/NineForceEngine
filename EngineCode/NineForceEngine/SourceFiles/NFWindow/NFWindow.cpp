@@ -212,8 +212,8 @@ bool NineForceEngine::NFWindow::InitWindow()
     else
     {
         // If windowed then set it to 800x600 resolution.
-        _screenWidth = NFGlobalConfig::Instance()->GetScreenWidth();
-        _screenHeight = NFGlobalConfig::Instance()->GetScreenHeight();
+        _screenWidth = NFGlobalConfig::Instance()->GetResolutionWidth();
+        _screenHeight = NFGlobalConfig::Instance()->GetResolutionHeight();
 
         // Place the window in the middle of the screen.
         _posX = (GetSystemMetrics(SM_CXSCREEN) - _screenWidth) / 2;
