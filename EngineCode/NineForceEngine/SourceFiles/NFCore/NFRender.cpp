@@ -125,7 +125,7 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
     _swapChainDesc.Flags = 0;
 
     IDXGIDevice* _dxgiDevice = nullptr;
-    _result = mDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(& _dxgiDevice));
+    _result = mDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&_dxgiDevice));
     if (FAILED(_result))
     {
         MessageBox(
@@ -139,7 +139,7 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
     }
 
     IDXGIAdapter* _dxgiAdapter = nullptr;
-    _result = _dxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(& _dxgiAdapter));
+    _result = _dxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&_dxgiAdapter));
     if (FAILED(_result))
     {
         MessageBox(
@@ -179,11 +179,16 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
         return false;
     }
 
-    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(_dxgiFactory));
+    //IUnknown** _testPtr = (IUnknown**)&_dxgiAdapter;
+    //IUnknown* _finalPtr = *_testPtr;
 
-    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(_dxgiAdapter));
+    //_finalPtr->Release();
 
-    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(_dxgiDevice));
+    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(&_dxgiFactory));
+
+    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(&_dxgiAdapter));
+
+    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(&_dxgiDevice));
 
     //end
 
@@ -221,7 +226,7 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
         return false;
     }
 
-    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(_backBuffer));
+    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(&_backBuffer));
 
     // end
 

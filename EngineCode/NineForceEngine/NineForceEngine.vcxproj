@@ -84,7 +84,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -97,7 +97,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -145,6 +145,7 @@
     <ClCompile Include="SourceFiles\NFCore\NFInput.cpp" />
     <ClCompile Include="SourceFiles\NFCore\NFRender.cpp" />
     <ClCompile Include="SourceFiles\NFCore\NFTimer.cpp" />
+    <ClCompile Include="SourceFiles\NFCore\NFUtility.cpp" />
     <ClCompile Include="SourceFiles\NFMain.cpp" />
     <ClCompile Include="SourceFiles\NFUtility\NFGlobalConfig.cpp" />
     <ClCompile Include="SourceFiles\NFWindow\NFWindow.cpp" />

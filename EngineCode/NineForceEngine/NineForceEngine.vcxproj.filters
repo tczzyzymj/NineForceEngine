@@ -63,11 +63,11 @@
     <ClCompile Include="SourceFiles\NFCore\NFTimer.cpp">
       <Filter>Source Files\NFCore</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\NFCore\NFUtility.cpp">
-      <Filter>Source Files\NFUtility</Filter>
-    </ClCompile>
     <ClCompile Include="SourceFiles\NFCore\NFInput.cpp">
       <Filter>Source Files\NFCore</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\NFCore\NFUtility.cpp">
+      <Filter>Source Files\NFUtility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -93,9 +93,6 @@
       <Filter>Header Files\NFUtility</Filter>
     </ClInclude>
     <ClInclude Include="HeadFiles\NFCore\NFTimer.h">
-      <Filter>Header Files\NFCore</Filter>
-    </ClInclude>
-    <ClInclude Include="HeadFiles\NFCore\NFSingleton.h">
       <Filter>Header Files\NFCore</Filter>
     </ClInclude>
     <ClInclude Include="HeadFiles\NFCore\NFInput.h">
