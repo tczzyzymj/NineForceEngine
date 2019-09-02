@@ -11,7 +11,7 @@ namespace NineForceEngine
         bool Init();
 
 
-        float GetDeltaTime() const;
+        double GetDeltaTime() const;
 
 
         void BeginRecord();
@@ -28,12 +28,12 @@ namespace NineForceEngine
         NFTimer() = default;
 
 
-        float mDeltaTime = 0.0f;
-
-
-        long mBeginRecordTime = 0;
+        double mNewDeltaTime = 0;
 
 
         double mSecondsPerTime = 0.0;
+
+
+        _int64 mBeginQueryTimeCount = 0;
     };
 }

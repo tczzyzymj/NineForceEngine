@@ -226,7 +226,8 @@ bool NineForceEngine::NFWindow::InitWindow()
         mApplicationName,
         mApplicationName,
         WS_OVERLAPPEDWINDOW,
-        // | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
+        //^ WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX,
+        // this options are try to block min & max & resize by mouse drag
         _posX,
         _posY,
         _screenWidth,

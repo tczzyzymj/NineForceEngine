@@ -4,27 +4,36 @@
 
 bool NineForceEngine::NFTimer::Init()
 {
-    mDeltaTime = 0.0167f; // when init, assume it's 60 fps;
+    mNewDeltaTime = 1.0f / 60;
+
+    long _countPerSecond;
+
+    QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&_countPerSecond));
+
+    mSecondsPerTime = 1.0 / static_cast<double>(_countPerSecond);
 
     return true;
 }
 
 
-float NineForceEngine::NFTimer::GetDeltaTime() const
+double NineForceEngine::NFTimer::GetDeltaTime() const
 {
-    return mDeltaTime;
+    return mNewDeltaTime;
 }
 
 
 void NineForceEngine::NFTimer::BeginRecord()
 {
-    mBeginRecordTime = clock();
+    QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&mBeginQueryTimeCount));
 }
 
 
 void NineForceEngine::NFTimer::EndRecord()
 {
-    const auto _currentTime = clock();
+    __int64 _tempCount;
+    QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&_tempCount));
 
-    mDeltaTime = static_cast<float>(_currentTime - mBeginRecordTime);
+    auto _countSpan = _tempCount - mBeginQueryTimeCount;
+
+    mNewDeltaTime = _countSpan * mSecondsPerTime;
 }

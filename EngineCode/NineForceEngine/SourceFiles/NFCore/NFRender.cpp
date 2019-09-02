@@ -179,9 +179,6 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
         return false;
     }
 
-    //IUnknown** _testPtr = (IUnknown**)&_dxgiAdapter;
-    //IUnknown* _finalPtr = *_testPtr;
-
     //_finalPtr->Release();
 
     NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(&_dxgiFactory));
@@ -247,9 +244,24 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
 
     _depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
-    _depthStencilDesc.CPUAccessFlags = 0; // no cpu access, it's a slow opration,should avoid
+    _depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+    _depthStencilDesc.CPUAccessFlags = 0; // no cpu access, it's a slow operation, should avoid
 
     _depthStencilDesc.MiscFlags = 0;
+
+    if (_globalIns->GetUse4XMSAA())
+    {
+        _depthStencilDesc.SampleDesc.Count = 4;
+
+        _depthStencilDesc.SampleDesc.Quality = m4XMSAAQuality - 1;
+    }
+    else
+    {
+        _depthStencilDesc.SampleDesc.Count = 1;
+
+        _depthStencilDesc.SampleDesc.Quality = 0;
+    }
 
     ID3D11Texture2D* _depthStencilBuffer = nullptr;
 
@@ -281,7 +293,7 @@ bool NineForceEngine::NFRender::Init(const HWND targetWindow)
         return false;
     }
 
-    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(_depthStencilBuffer));
+    NFUtility::ReleaseCOM(reinterpret_cast<IUnknown**>(&_depthStencilBuffer));
 
     // end
 

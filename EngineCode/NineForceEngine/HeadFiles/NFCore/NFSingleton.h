@@ -14,7 +14,7 @@ namespace NineForceEngine
         }
 
 
-        virtual ~NFSingleton() noexcept
+        virtual ~NFSingleton()
         {
         }
 

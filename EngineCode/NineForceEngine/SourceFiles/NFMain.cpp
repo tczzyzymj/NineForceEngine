@@ -2,6 +2,8 @@
 #include "NFUtility/NFGlobalConfig.h"
 #include "NFCore/NFTimer.h"
 #include <string>
+#include "NFUtility/NFUtility.h"
+#include <stdio.h>
 
 
 using namespace NineForceEngine;
@@ -20,27 +22,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
     auto _timerIns = NFTimer::Instance();
 
+    _timerIns->Init();
+
     while (_globalIns->GetIsRunning())
     {
         _timerIns->BeginRecord();
 
-
-        int a = 0;
-
-        while (a < 1000000)
-        {
-            ++a;
-        }
-
-        const auto _result = _engine->Update(_timerIns->GetDeltaTime());
+        const auto _result = _engine->Update(static_cast<float>(_timerIns->GetDeltaTime()));
 
         _timerIns->EndRecord();
-
-        const auto _deltaTime = _timerIns->GetDeltaTime();
-
-        std::string _errorMsg = "DeltaTime is : " + std::to_string(_deltaTime);
-
-        MessageBox(nullptr, LPCWSTR(_errorMsg.c_str()), L"Error", 0);
 
         if (!_result)
         {

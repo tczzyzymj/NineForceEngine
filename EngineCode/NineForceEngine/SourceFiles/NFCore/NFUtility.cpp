@@ -12,3 +12,15 @@ void NineForceEngine::NFUtility::ReleaseCOM(IUnknown** targetPtr)
 
     (*targetPtr) = nullptr;
 }
+
+
+void NineForceEngine::NFUtility::ShowMessageBox(const char* targetContent)
+{
+//#ifdef UNICODE
+//    MessageBox(nullptr, )
+//#else
+//
+//#endif
+
+    
+}
