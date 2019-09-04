@@ -46,6 +46,11 @@ bool NineForceEngine::NFEngine::Init()
 }
 
 
+void NineForceEngine::NFEngine::Resize()
+{
+}
+
+
 bool NineForceEngine::NFEngine::Update(float deltaTime) const
 {
     if (!mHasInit)

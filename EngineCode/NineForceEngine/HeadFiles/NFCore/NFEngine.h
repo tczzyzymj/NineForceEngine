@@ -19,6 +19,9 @@ namespace NineForceEngine
         bool Init();
 
 
+        void Resize();
+
+
         bool Update(float deltaTime) const;
 
 

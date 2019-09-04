@@ -1,5 +1,9 @@
 #include "NFWindow/NFWindow.h"
 #include "NFUtility/NFGlobalConfig.h"
+#include "NFCore/NFEngine.h"
+
+
+NineForceEngine::NFWindow* NineForceEngine::NFWindow::mIns;
 
 
 NineForceEngine::NFWindow::NFWindow()
@@ -83,6 +87,8 @@ bool NineForceEngine::NFWindow::Init()
         return false;
     }
 
+    mIns = this;
+
     mHasInit = true;
 
     return true;
@@ -91,6 +97,7 @@ bool NineForceEngine::NFWindow::Init()
 
 void NineForceEngine::NFWindow::OnResize()
 {
+    
 }
 
 
@@ -116,7 +123,6 @@ LRESULT NineForceEngine::NFWindow::MessageHandler(HWND hwnd, UINT message, WPARA
             return 0;
         }
 
-
         default:
         {
             // Any other messages send to the default message handler as our application won't make use of them.
@@ -127,7 +133,7 @@ LRESULT NineForceEngine::NFWindow::MessageHandler(HWND hwnd, UINT message, WPARA
 }
 
 
-LRESULT NineForceEngine::NFWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+LRESULT NineForceEngine::NFWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
@@ -137,9 +143,39 @@ LRESULT NineForceEngine::NFWindow::WndProc(HWND hwnd, UINT message, WPARAM wpara
             PostQuitMessage(0);
             return 0;
         }
+        case WM_SIZE:
+        {
+            if (mIns == nullptr || !mIns->mHasInit)
+            {
+                return 0;
+            }
+
+            const int _clientWidth = LOWORD(lParam);
+
+            const int _clientHeight = HIWORD(lParam);
+
+            NFGlobalConfig::Instance()->SetResolutionWidth(_clientWidth);
+
+            NFGlobalConfig::Instance()->SetResolutionHeight(_clientHeight);
+
+            if (wParam == SIZE_MINIMIZED)
+            {
+            }
+            else if (wParam == SIZE_MAXIMIZED)
+            {
+                mIns->OnResize();
+            }
+            else if (wParam == SIZE_RESTORED)
+            {
+                mIns->OnResize();
+            }
+
+            return 0;
+        }
+
         default:
         {
-            return MessageHandler(hwnd, message, wparam, lparam);
+            return MessageHandler(hWnd, message, wParam, lParam);
         }
     }
 }
@@ -225,9 +261,8 @@ bool NineForceEngine::NFWindow::InitWindow()
         WS_EX_APPWINDOW,
         mApplicationName,
         mApplicationName,
-        WS_OVERLAPPEDWINDOW,
-        //^ WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX,
         // this options are try to block min & max & resize by mouse drag
+        WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX,
         _posX,
         _posY,
         _screenWidth,

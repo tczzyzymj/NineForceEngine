@@ -20,9 +20,6 @@ namespace NineForceEngine
         bool Init();
 
 
-        /*
-         * on window resize, need change the graphic
-         */
         void OnResize();
 
 
@@ -52,6 +49,9 @@ namespace NineForceEngine
 
 
         LPCWSTR mApplicationName = nullptr;
+
+
+        static NFWindow* mIns;
 
 
         bool InitWindow();
