@@ -2,7 +2,7 @@
 #include <NFCore/NFSingleton.h>
 #include "NFEvent/NFEventInterface.h"
 #include <map>
-#include <vector>
+#include <list>
 
 
 namespace NineForceEngine
@@ -13,13 +13,13 @@ namespace NineForceEngine
         void RegisterEvent(int messageID, void** callbackHandler);
 
 
-        void UnRegisterEvent(void** callbackHandler);
+        void UnRegisterEvent(int messageID, void** callbackHandler);
 
 
         void NotifyEvent(int messagID, NFEventInterface* targetEventPtr);
 
 
     private:
-        std::map<int, std::vector<void**>> mEventMap;
+        std::map<int, std::list<void**>> mEventMap;
     };
 }

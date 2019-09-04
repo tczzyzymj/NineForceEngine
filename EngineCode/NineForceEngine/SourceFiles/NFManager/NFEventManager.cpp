@@ -8,11 +8,11 @@ void NineForceEngine::NFEventManager::RegisterEvent(int messageID, void** callba
 
     if (_findIT == mEventMap.end())
     {
-        std::vector<void**> _newValue;
+        std::list<void**> _newValue;
 
         _newValue.push_back(callbackHandler);
 
-        mEventMap.insert(std::pair<int, std::vector<void**>>(messageID, _newValue));
+        mEventMap.insert(std::pair<int, std::list<void**>>(messageID, _newValue));
     }
     else
     {
@@ -34,8 +34,18 @@ void NineForceEngine::NFEventManager::RegisterEvent(int messageID, void** callba
 }
 
 
-void NineForceEngine::NFEventManager::UnRegisterEvent(void** callbackHandler)
+void NineForceEngine::NFEventManager::UnRegisterEvent(int messageID, void** callbackHandler)
 {
+    auto _findIT = mEventMap.find(messageID);
+
+    if (_findIT == mEventMap.end())
+    {
+        return;
+    }
+
+    auto _targetVector = _findIT->second;
+
+    _targetVector.remove(callbackHandler);
 }
 
 
