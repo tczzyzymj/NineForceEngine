@@ -13,10 +13,30 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\NFCommonInclude">
+      <UniqueIdentifier>{d763e10d-bf60-43aa-beb6-bf3e655e97f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NFWindow">
+      <UniqueIdentifier>{92da240c-3968-466f-ad9a-112c7154cde1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NFWindow">
+      <UniqueIdentifier>{84f9dc06-1e33-4592-9acd-0c41eab7108a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SourceFiles\NFWindow\NFWindow.cpp">
+      <Filter>Source Files\NFWindow</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HeadFiles\CommonInclude\NFCommonInclude.h">
+      <Filter>Header Files\NFCommonInclude</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\NFWindow\NFWindow.h">
+      <Filter>Header Files\NFWindow</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
