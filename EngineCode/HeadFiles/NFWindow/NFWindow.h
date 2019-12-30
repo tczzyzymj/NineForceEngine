@@ -12,6 +12,9 @@ public:
 
 
     // update per frame
-    bool Update();
+    int Update();
+
+
+    void Draw();
 private:
 };

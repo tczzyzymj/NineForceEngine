@@ -11,13 +11,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
         return -1;
     }
 
-    while (true)
-    {
-        if(!_window->Update())
-        {
-            return -1;
-        }
-    }
-
-    return 0;
+    return _window->Update();
 }
