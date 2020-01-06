@@ -4,12 +4,12 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
-    auto* _window = new NFWindow();
+    auto* _window = new NFWindow(hInstance);
 
-    if (!_window->Init(hInstance))
+    if (!_window->Init())
     {
         return -1;
     }
 
-    return _window->Update();
+    return _window->Run();
 }
