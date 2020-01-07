@@ -1,5 +1,8 @@
 #include "NFWindow/NFWindow.h"
 
+using Microsoft::WRL::ComPtr;
+using namespace std;
+
 
 NFWindow::NFWindow(HINSTANCE hIns) : mIns(hIns)
 {
@@ -25,8 +28,31 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 
-bool NFWindow::InitD3D()
+bool NFWindow::InitD3D() const
 {
+#if defined(DEBUG) || defined(_DEBUG)
+    {
+        ComPtr<ID3D12Debug> _debugController;
+
+        auto _result = D3D12GetDebugInterface(IID_PPV_ARGS(&_debugController));
+        if (FAILED(_result))
+        {
+            MessageBox(
+                nullptr,
+                L"Create DirectX Debug failed!",
+                L"Error",
+                MB_OK
+            );
+
+            return false;
+        }
+
+        _debugController->EnableDebugLayer();
+    }
+
+#endif
+
+
     return true;
 }
 
@@ -138,9 +164,9 @@ bool NFWindow::InitWindow()
 
     AdjustWindowRect(&_r, WS_OVERLAPPEDWINDOW, false);
 
-    auto _width = _r.right - _r.left;
+    const auto _width = _r.right - _r.left;
 
-    auto _height = _r.bottom - _r.top;
+    const auto _height = _r.bottom - _r.top;
 
     mWnd = CreateWindow(
         L"NFWindow",
@@ -150,10 +176,10 @@ bool NFWindow::InitWindow()
         CW_USEDEFAULT,
         _width,
         _height,
-        0,
-        0,
+        nullptr,
+        nullptr,
         mIns,
-        0
+        nullptr
     );
 
     if (mWnd == nullptr)

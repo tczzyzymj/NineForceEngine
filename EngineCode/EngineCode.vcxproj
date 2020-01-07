@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HeadFiles\CommonInclude\NFCommonInclude.h" />
+    <ClInclude Include="HeadFiles\NFCommonInclude\NFUtility.h" />
     <ClInclude Include="HeadFiles\NFWindow\NFWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

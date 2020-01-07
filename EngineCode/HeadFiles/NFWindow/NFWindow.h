@@ -15,7 +15,7 @@ public:
     bool InitWindow();
 
 
-    bool InitD3D();
+    bool InitD3D() const;
 
 
     void Update();
