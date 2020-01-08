@@ -28,32 +28,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 
-bool NFWindow::InitD3D() const
+bool NFWindow::InitD3D()
 {
-#if defined(DEBUG) || defined(_DEBUG)
-    {
-        ComPtr<ID3D12Debug> _debugController;
+    mDXRender = new NFDXRender();
 
-        auto _result = D3D12GetDebugInterface(IID_PPV_ARGS(&_debugController));
-        if (FAILED(_result))
-        {
-            MessageBox(
-                nullptr,
-                L"Create DirectX Debug failed!",
-                L"Error",
-                MB_OK
-            );
-
-            return false;
-        }
-
-        _debugController->EnableDebugLayer();
-    }
-
-#endif
-
-
-    return true;
+    return mDXRender->Init();
 }
 
 

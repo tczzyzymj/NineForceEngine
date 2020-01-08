@@ -22,6 +22,12 @@
     <Filter Include="Source Files\NFWindow">
       <UniqueIdentifier>{84f9dc06-1e33-4592-9acd-0c41eab7108a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\NFDXRender">
+      <UniqueIdentifier>{6886ea97-e2f8-4030-b781-d007a913e538}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NFDXRender">
+      <UniqueIdentifier>{83578e71-f8c4-4cc6-8f3b-2110a0d56495}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -29,6 +35,9 @@
     </ClCompile>
     <ClCompile Include="SourceFiles\NFWindow\NFWindow.cpp">
       <Filter>Source Files\NFWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\NFDXRender\NFDXRender.cpp">
+      <Filter>Source Files\NFDXRender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +49,9 @@
     </ClInclude>
     <ClInclude Include="HeadFiles\NFCommonInclude\NFUtility.h">
       <Filter>Header Files\NFCommonInclude</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\NFDXRender\NFDXRender.h">
+      <Filter>Header Files\NFDXRender</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

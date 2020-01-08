@@ -1,5 +1,6 @@
 #pragma once
 #include "NFCommonInclude.h"
+#include "NFDXRender/NFDXRender.h"
 
 
 class NFWindow
@@ -15,10 +16,11 @@ public:
     bool InitWindow();
 
 
-    bool InitD3D() const;
+    bool InitD3D();
 
 
     void Update();
+
 
     int Run();
 
@@ -33,6 +35,9 @@ public:
 
 
 private:
+
+    NFDXRender* mDXRender;
+
 
     static NFWindow* mNFWindow;
 
