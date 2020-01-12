@@ -153,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HeadFiles\CommonInclude\NFCommonInclude.h" />
+    <ClInclude Include="HeadFiles\NFCommonInclude\NFSetting.h" />
     <ClInclude Include="HeadFiles\NFCommonInclude\NFUtility.h" />
     <ClInclude Include="HeadFiles\NFDXRender\NFDXRender.h" />
     <ClInclude Include="HeadFiles\NFWindow\NFWindow.h" />

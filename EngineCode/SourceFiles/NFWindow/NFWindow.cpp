@@ -1,4 +1,6 @@
 #include "NFWindow/NFWindow.h"
+#include "NFSetting.h"
+
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
@@ -32,7 +34,7 @@ bool NFWindow::InitD3D()
 {
     mDXRender = new NFDXRender();
 
-    return mDXRender->Init();
+    return mDXRender->Init(mWnd);
 }
 
 
@@ -57,7 +59,7 @@ int NFWindow::Run()
         {
             Update();
 
-            Draw();
+            Render();
         }
     }
 
@@ -65,8 +67,14 @@ int NFWindow::Run()
 }
 
 
-void NFWindow::Draw()
+void NFWindow::Render()
 {
+    if (mDXRender == nullptr)
+    {
+        return;
+    }
+
+    mDXRender->Render();
 }
 
 
@@ -139,7 +147,12 @@ bool NFWindow::InitWindow()
         return false;
     }
 
-    RECT _r = {0, 0, mClientWidth, mClientHeight};
+    RECT _r = {
+        0,
+        0,
+        static_cast<int>(NFSetting::GetInstance().GetClientWidth()),
+        static_cast<int>(NFSetting::GetInstance().GetClientHeight())
+    };
 
     AdjustWindowRect(&_r, WS_OVERLAPPEDWINDOW, false);
 

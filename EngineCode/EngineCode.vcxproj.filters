@@ -53,5 +53,8 @@
     <ClInclude Include="HeadFiles\NFDXRender\NFDXRender.h">
       <Filter>Header Files\NFDXRender</Filter>
     </ClInclude>
+    <ClInclude Include="HeadFiles\NFCommonInclude\NFSetting.h">
+      <Filter>Header Files\NFCommonInclude</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

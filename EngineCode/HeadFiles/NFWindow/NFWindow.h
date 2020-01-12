@@ -25,7 +25,7 @@ public:
     int Run();
 
 
-    void Draw();
+    void Render();
 
 
     static NFWindow* GetWindowPtr();
@@ -43,12 +43,6 @@ private:
 
 
     HINSTANCE mIns;
-
-
-    int mClientWidth = 1366;
-
-
-    int mClientHeight = 768;
 
 
     HWND mWnd;
