@@ -2,6 +2,7 @@
 #include "NFCommonInclude.h"
 #include <vector>
 #include "NFSetting.h"
+#include "DirectXColors.h"
 
 
 using Microsoft::WRL::ComPtr;
@@ -179,6 +180,11 @@ bool NFDXRender::Init(HWND targetHwnd)
         return false;
     }
 
+    if (!BuildPipleState())
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -239,7 +245,7 @@ bool NFDXRender::CreateCommandObjects()
 
     _result = mDevice->CreateCommandAllocator(
         D3D12_COMMAND_LIST_TYPE_DIRECT,
-        IID_PPV_ARGS(mDirectCmdListAlloc.GetAddressOf())
+        IID_PPV_ARGS(mCommandAllocator.GetAddressOf())
     );
 
     if (FAILED(_result))
@@ -257,7 +263,7 @@ bool NFDXRender::CreateCommandObjects()
     _result = mDevice->CreateCommandList(
         0,
         D3D12_COMMAND_LIST_TYPE_DIRECT,
-        mDirectCmdListAlloc.Get(),
+        mCommandAllocator.Get(),
         nullptr,
         IID_PPV_ARGS(mCommandList.GetAddressOf())
     );
@@ -377,6 +383,150 @@ bool NFDXRender::CreateRtvAndDsvDescriptionHeaps()
 }
 
 
-void NFDXRender::Render()
+bool NFDXRender::BuildPipleState()
 {
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC _desc = {};
+
+    ZeroMemory(&_desc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+
+    return true;
+}
+
+
+bool NFDXRender::Render()
+{
+    auto _result = mCommandAllocator->Reset();
+
+    if (FAILED(_result))
+    {
+        MessageBox(
+            nullptr,
+            L"Command allocator reset failed!",
+            L"Error",
+            MB_OK
+        );
+
+        return false;
+    }
+
+    _result = mCommandList->Reset(mCommandAllocator.Get(), mPipeLineState.Get());
+
+    if (FAILED(_result))
+    {
+        MessageBox(
+            nullptr,
+            L"Command list reset failed!",
+            L"Error",
+            MB_OK
+        );
+
+        return false;
+    }
+
+    mCommandList->RSSetViewports(1, &mScreenViewport);
+
+    mCommandList->RSSetScissorRects(1, &mScissorRect);
+
+    mCommandList->ClearRenderTargetView(
+        CurrentBackBufferView(),
+        DirectX::Colors::Gray,
+        0,
+        nullptr
+    );
+
+    mCommandList->ClearDepthStencilView(
+        DepthStencilView(),
+        D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+        1.0f,
+        0,
+        0,
+        nullptr
+    );
+
+    mCommandList->OMSetRenderTargets(
+        1,
+        &CurrentBackBufferView(),
+        true,
+        &DepthStencilView()
+    );
+
+    mCommandList->Close();
+
+    ID3D12CommandList* cmdsLists[] = {mCommandList.Get()};
+
+    mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
+    _result = mSwapChain->Present(0, 0);
+
+    if (FAILED(_result))
+    {
+        MessageBox(nullptr, L"SwapChain present failed!", L"Error", MB_OK);
+
+        return false;
+    }
+
+    mCurrentBackBuffer = (mCurrentBackBuffer + 1) % mSwapChainBufferCount;
+
+    FlushCommandQueue();
+
+    return true;
+}
+
+
+D3D12_CPU_DESCRIPTOR_HANDLE NFDXRender::DepthStencilView() const
+{
+    return mDsvHeap->GetCPUDescriptorHandleForHeapStart();
+}
+
+
+void NFDXRender::FlushCommandQueue()
+{
+    mCurrentFence++;
+
+    auto _result = mCommandQueue->Signal(mFence.Get(), mCurrentFence);
+
+    if (FAILED(_result))
+    {
+        MessageBox(nullptr, L"Flush command queue failed!", L"Error", MB_OK);
+
+        return;
+    }
+
+    if (mFence->GetCompletedValue() < mCurrentFence)
+    {
+        HANDLE _eventHandler = CreateEventEx(
+            nullptr,
+            nullptr,
+            false,
+            EVENT_ALL_ACCESS
+        );
+
+        _result = mFence->SetEventOnCompletion(mCurrentFence, _eventHandler);
+
+        if (FAILED(_result))
+        {
+            MessageBox(
+                nullptr,
+                L"SetEventOnCompletion failed!",
+                L"Error",
+                MB_OK
+            );
+
+            return;
+        }
+
+        WaitForSingleObject(_eventHandler, INFINITE);
+
+        CloseHandle(_eventHandler);
+    }
+}
+
+
+D3D12_CPU_DESCRIPTOR_HANDLE NFDXRender::CurrentBackBufferView() const
+{
+    D3D12_CPU_DESCRIPTOR_HANDLE _result = {};
+
+    ZeroMemory(&_result, sizeof(D3D12_CPU_DESCRIPTOR_HANDLE));
+
+    return _result;
 }

@@ -26,7 +26,19 @@ public:
     bool CreateRtvAndDsvDescriptionHeaps();
 
 
-    void Render();
+    bool BuildPipleState();
+
+
+    bool Render();
+
+
+    D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const;
+
+
+    D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView()const;
+
+
+    void FlushCommandQueue();
 
 
 private:
@@ -45,10 +57,13 @@ private:
     ComPtr<ID3D12CommandQueue> mCommandQueue = nullptr;
 
 
-    ComPtr<ID3D12CommandAllocator> mDirectCmdListAlloc = nullptr;
+    ComPtr<ID3D12CommandAllocator> mCommandAllocator = nullptr;
 
 
     ComPtr<ID3D12GraphicsCommandList> mCommandList = nullptr;
+
+
+    ComPtr<ID3D12PipelineState> mPipeLineState = nullptr;
 
 
     ComPtr<ID3D12DescriptorHeap> mRtvHeap;
@@ -68,6 +83,8 @@ private:
 
     UINT m4sMsaaQuality = 0;
 
+    UINT mCurrentBackBuffer = 0;
+
 
     DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
@@ -76,4 +93,13 @@ private:
 
 
     static const UINT mSwapChainBufferCount = 2;
+
+
+    D3D12_VIEWPORT mScreenViewport;
+
+
+    D3D12_RECT mScissorRect;
+
+
+    UINT64 mCurrentFence = 0;
 };
