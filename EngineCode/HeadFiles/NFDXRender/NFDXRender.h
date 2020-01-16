@@ -32,16 +32,55 @@ public:
     bool Render();
 
 
+    bool OnResize();
+
+    ID3D12Resource* const CurrentBackBuffer();
+
+
     D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const;
 
 
-    D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView()const;
+    D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
 
 
     void FlushCommandQueue();
 
 
 private:
+
+    UINT mRtvDescriptorSize = 0;
+
+
+    UINT mDsvDescriptorSize = 0;
+
+
+    UINT mCbvSrvUavDescriptorSize = 0;
+
+
+    UINT m4xMsaaQuality = 0;
+
+
+    UINT mCurrentBackBuffer = 0;
+
+
+    DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+
+    DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+
+    static const UINT mSwapChainBufferCount = 2;
+
+
+    D3D12_VIEWPORT mScreenViewport;
+
+
+    D3D12_RECT mScissorRect;
+
+
+    UINT64 mCurrentFence = 0;
+
+
     ComPtr<IDXGIFactory4> mFactory = nullptr;
 
 
@@ -72,34 +111,8 @@ private:
     ComPtr<ID3D12DescriptorHeap> mDsvHeap;
 
 
-    UINT mRtvDescriptorSize = 0;
+    ComPtr<ID3D12Resource> mSwapChainBuffer[mSwapChainBufferCount];
 
 
-    UINT mDsvDescriptorSize = 0;
-
-
-    UINT mCbvSrvUavDescriptorSize = 0;
-
-
-    UINT m4sMsaaQuality = 0;
-
-    UINT mCurrentBackBuffer = 0;
-
-
-    DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-
-
-    DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-
-    static const UINT mSwapChainBufferCount = 2;
-
-
-    D3D12_VIEWPORT mScreenViewport;
-
-
-    D3D12_RECT mScissorRect;
-
-
-    UINT64 mCurrentFence = 0;
+    ComPtr<ID3D12Resource> mDepthStencilBuffer;
 };

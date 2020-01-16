@@ -78,6 +78,12 @@ void NFWindow::Render()
 }
 
 
+void NFWindow::OnResize()
+{
+    mDXRender->OnResize();
+}
+
+
 NFWindow* NFWindow::GetWindowPtr()
 {
     return mNFWindow;
@@ -121,6 +127,8 @@ bool NFWindow::Init()
         return false;
     }
 
+    OnResize();
+
     return true;
 }
 
@@ -150,8 +158,8 @@ bool NFWindow::InitWindow()
     RECT _r = {
         0,
         0,
-        static_cast<int>(NFSetting::GetInstance().GetClientWidth()),
-        static_cast<int>(NFSetting::GetInstance().GetClientHeight())
+        static_cast<int>(NFSetting::Ins().GetClientWidth()),
+        static_cast<int>(NFSetting::Ins().GetClientHeight())
     };
 
     AdjustWindowRect(&_r, WS_OVERLAPPEDWINDOW, false);

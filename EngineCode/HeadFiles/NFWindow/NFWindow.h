@@ -27,6 +27,8 @@ public:
 
     void Render();
 
+    void OnResize();
+
 
     static NFWindow* GetWindowPtr();
 

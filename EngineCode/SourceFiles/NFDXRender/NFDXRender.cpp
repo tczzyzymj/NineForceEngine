@@ -156,9 +156,9 @@ bool NFDXRender::Init(HWND targetHwnd)
             return false;
         }
 
-        m4sMsaaQuality = _msQualityLevels.NumQualityLevels;
+        m4xMsaaQuality = _msQualityLevels.NumQualityLevels;
 
-        assert(m4sMsaaQuality > 0 && "Unexpected MSAA quality level.");
+        assert(m4xMsaaQuality > 0 && "Unexpected MSAA quality level.");
     }
 
 #ifdef _DEBUG
@@ -292,9 +292,9 @@ bool NFDXRender::CreateSwapChain(HWND targetHwnd)
 
     DXGI_SWAP_CHAIN_DESC _desc;
 
-    _desc.BufferDesc.Width = NFSetting::GetInstance().GetClientWidth();
+    _desc.BufferDesc.Width = NFSetting::Ins().GetClientWidth();
 
-    _desc.BufferDesc.Height = NFSetting::GetInstance().GetClientHeight();
+    _desc.BufferDesc.Height = NFSetting::Ins().GetClientHeight();
 
     _desc.BufferDesc.RefreshRate.Numerator = 60;
 
@@ -306,9 +306,9 @@ bool NFDXRender::CreateSwapChain(HWND targetHwnd)
 
     _desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
-    _desc.SampleDesc.Count = NFSetting::GetInstance().GetEnable4XMSAA() ? 4 : 1;
+    _desc.SampleDesc.Count = NFSetting::Ins().GetEnable4xMsaa() ? 4 : 1;
 
-    _desc.SampleDesc.Quality = NFSetting::GetInstance().GetEnable4XMSAA() ? (m4sMsaaQuality - 1) : 0;
+    _desc.SampleDesc.Quality = NFSetting::Ins().GetEnable4xMsaa() ? (m4xMsaaQuality - 1) : 0;
 
     _desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
@@ -395,32 +395,21 @@ bool NFDXRender::BuildPipleState()
 
 bool NFDXRender::Render()
 {
-    auto _result = mCommandAllocator->Reset();
+    ThrowIfFailed(mCommandAllocator->Reset());
 
-    if (FAILED(_result))
+    ThrowIfFailed(mCommandList->Reset( mCommandAllocator.Get(), nullptr ));
+
     {
-        MessageBox(
-            nullptr,
-            L"Command allocator reset failed!",
-            L"Error",
-            MB_OK
-        );
+        D3D12_RESOURCE_BARRIER _desc;
 
-        return false;
-    }
+        _desc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        _desc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        _desc.Transition.pResource = CurrentBackBuffer();
+        _desc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+        _desc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        _desc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
-    _result = mCommandList->Reset(mCommandAllocator.Get(), mPipeLineState.Get());
-
-    if (FAILED(_result))
-    {
-        MessageBox(
-            nullptr,
-            L"Command list reset failed!",
-            L"Error",
-            MB_OK
-        );
-
-        return false;
+        mCommandList->ResourceBarrier(1, &_desc);
     }
 
     mCommandList->RSSetViewports(1, &mScreenViewport);
@@ -450,26 +439,174 @@ bool NFDXRender::Render()
         &DepthStencilView()
     );
 
-    mCommandList->Close();
-
-    ID3D12CommandList* cmdsLists[] = {mCommandList.Get()};
-
-    mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-
-    _result = mSwapChain->Present(0, 0);
-
-    if (FAILED(_result))
     {
-        MessageBox(nullptr, L"SwapChain present failed!", L"Error", MB_OK);
+        D3D12_RESOURCE_BARRIER _desc;
 
-        return false;
+        _desc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        _desc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        _desc.Transition.pResource = CurrentBackBuffer();
+        _desc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        _desc.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+        _desc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+        mCommandList->ResourceBarrier(1, &_desc);
     }
+
+    ThrowIfFailed(mCommandList->Close());
+
+    ID3D12CommandList* _cmdsLists[] = {mCommandList.Get()};
+
+    mCommandQueue->ExecuteCommandLists(_countof(_cmdsLists), _cmdsLists);
+
+    ThrowIfFailed(mSwapChain->Present(0, 0));
 
     mCurrentBackBuffer = (mCurrentBackBuffer + 1) % mSwapChainBufferCount;
 
     FlushCommandQueue();
 
     return true;
+}
+
+
+bool NFDXRender::OnResize()
+{
+    assert(mDevice);
+
+    assert(mSwapChain);
+
+    assert(mCommandAllocator);
+
+    FlushCommandQueue();
+
+    ThrowIfFailed(
+        mCommandList->Reset(mCommandAllocator.Get(), nullptr)
+    );
+
+    for (int i = 0; i < mSwapChainBufferCount; ++i)
+    {
+        mSwapChainBuffer[i].Reset();
+    }
+
+    mDepthStencilBuffer.Reset();
+
+    ThrowIfFailed(
+        mSwapChain->ResizeBuffers(
+            mSwapChainBufferCount,
+            NFSetting::Ins().GetClientWidth(),
+            NFSetting::Ins().GetClientHeight(),
+            mBackBufferFormat,
+            DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
+        )
+    );
+
+    mCurrentBackBuffer = 0;
+
+    auto _rtvHeap = mRtvHeap->GetCPUDescriptorHandleForHeapStart();
+
+    for (UINT _i = 0; _i < mSwapChainBufferCount; ++_i)
+    {
+        ThrowIfFailed(mSwapChain->GetBuffer(_i, IID_PPV_ARGS(&mSwapChainBuffer[_i])));
+
+        mDevice->CreateRenderTargetView(
+            mSwapChainBuffer[_i].Get(),
+            nullptr,
+            _rtvHeap
+        );
+
+        _rtvHeap.ptr += (mRtvDescriptorSize);
+    }
+
+    D3D12_RESOURCE_DESC _depthStencilDesc = {};
+
+    _depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    _depthStencilDesc.Alignment = 0;
+    _depthStencilDesc.Width = NFSetting::Ins().GetClientWidth();
+    _depthStencilDesc.Height = NFSetting::Ins().GetClientHeight();
+    _depthStencilDesc.DepthOrArraySize = 1;
+    _depthStencilDesc.MipLevels = 1;
+    _depthStencilDesc.Format = mDepthStencilFormat;
+    _depthStencilDesc.SampleDesc.Count = NFSetting::Ins().GetEnable4xMsaa() ? 4 : 1;
+    _depthStencilDesc.SampleDesc.Quality = NFSetting::Ins().GetEnable4xMsaa() ? (m4xMsaaQuality - 1) : 0;
+    _depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    _depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+    D3D12_CLEAR_VALUE _optionClear;
+
+    _optionClear.Format = mDepthStencilFormat;
+    _optionClear.DepthStencil.Depth = 1.0f;
+    _optionClear.DepthStencil.Stencil = 0;
+
+    D3D12_HEAP_PROPERTIES _heapProperties = {};
+
+    _heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+    _heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    _heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+    _heapProperties.CreationNodeMask = 1;
+    _heapProperties.VisibleNodeMask = 1;
+
+    ThrowIfFailed(
+        mDevice->CreateCommittedResource(
+            &_heapProperties,
+            D3D12_HEAP_FLAG_NONE,
+            &_depthStencilDesc,
+            D3D12_RESOURCE_STATE_COMMON,
+            &_optionClear,
+            IID_PPV_ARGS(mDepthStencilBuffer.GetAddressOf())
+        )
+    );
+
+    mDevice->CreateDepthStencilView(
+        mDepthStencilBuffer.Get(),
+        nullptr,
+        mDsvHeap->GetCPUDescriptorHandleForHeapStart()
+    );
+
+    D3D12_RESOURCE_BARRIER _barrierDesc = {};
+    ZeroMemory(&_barrierDesc, sizeof(_barrierDesc));
+    _barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    _barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    _barrierDesc.Transition.pResource = mDepthStencilBuffer.Get();
+    _barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
+    _barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+    _barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+    mCommandList->ResourceBarrier(
+        1,
+        &_barrierDesc
+    );
+
+    ThrowIfFailed(mCommandList->Close());
+
+    ID3D12CommandList* _cmdList[] = {mCommandList.Get()};
+
+    mCommandQueue->ExecuteCommandLists(
+        _countof(_cmdList),
+        _cmdList
+    );
+
+    FlushCommandQueue();
+
+    mScreenViewport.TopLeftX = 0;
+    mScreenViewport.TopLeftY = 0;
+    mScreenViewport.Width = static_cast<float>(NFSetting::Ins().GetClientWidth());
+    mScreenViewport.Height = static_cast<float>(NFSetting::Ins().GetClientHeight());
+    mScreenViewport.MinDepth = 0.0f;
+    mScreenViewport.MaxDepth = 1.0f;
+
+    mScissorRect = {
+        0,
+        0,
+        static_cast<LONG>(NFSetting::Ins().GetClientWidth()),
+        static_cast<LONG>(NFSetting::Ins().GetClientHeight())
+    };
+
+    return true;
+}
+
+
+ID3D12Resource* const NFDXRender::CurrentBackBuffer()
+{
+    return mSwapChainBuffer[mCurrentBackBuffer].Get();
 }
 
 
@@ -524,9 +661,9 @@ void NFDXRender::FlushCommandQueue()
 
 D3D12_CPU_DESCRIPTOR_HANDLE NFDXRender::CurrentBackBufferView() const
 {
-    D3D12_CPU_DESCRIPTOR_HANDLE _result = {};
+    auto _result = mRtvHeap->GetCPUDescriptorHandleForHeapStart();
 
-    ZeroMemory(&_result, sizeof(D3D12_CPU_DESCRIPTOR_HANDLE));
+    _result.ptr += mCurrentBackBuffer * mRtvDescriptorSize;
 
     return _result;
 }

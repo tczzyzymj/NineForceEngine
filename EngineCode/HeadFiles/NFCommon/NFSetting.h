@@ -6,7 +6,7 @@ class NFSetting
 {
 public:
 
-    static NFSetting& GetInstance()
+    static NFSetting& Ins()
     {
         static NFSetting mIns;
 
@@ -32,10 +32,10 @@ public:
     void SetClientHeight(UINT targetValue);
 
 
-    void SetEnable4XMSAA(bool isEnable);
+    void SetEnable4xMsaa(bool isEnable);
 
 
-    bool GetEnable4XMSAA();
+    bool GetEnable4xMsaa();
 
 
 private :
@@ -78,13 +78,13 @@ inline void NFSetting::SetClientHeight(UINT targetValue)
 }
 
 
-inline void NFSetting::SetEnable4XMSAA(bool isEnable)
+inline void NFSetting::SetEnable4xMsaa(bool isEnable)
 {
     mEnable4XMSAA = isEnable;
 }
 
 
-inline bool NFSetting::GetEnable4XMSAA()
+inline bool NFSetting::GetEnable4xMsaa()
 {
     return mEnable4XMSAA;
 }

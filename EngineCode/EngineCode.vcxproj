@@ -72,17 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)HeadFiles;$(ProjectDir)HeadFiles\NFCommonInclude\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)HeadFiles;$(ProjectDir)HeadFiles\NFCommon\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)HeadFiles;$(ProjectDir)HeadFiles\NFCommonInclude\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)HeadFiles;$(ProjectDir)HeadFiles\NFCommon\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)HeadFiles;$(ProjectDir)HeadFiles\NFCommon\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)HeadFiles;$(ProjectDir)HeadFiles\NFCommon\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -148,13 +150,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="SourceFiles\NFCommon\NFUtility.cpp" />
     <ClCompile Include="SourceFiles\NFDXRender\NFDXRender.cpp" />
     <ClCompile Include="SourceFiles\NFWindow\NFWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HeadFiles\CommonInclude\NFCommonInclude.h" />
-    <ClInclude Include="HeadFiles\NFCommonInclude\NFSetting.h" />
-    <ClInclude Include="HeadFiles\NFCommonInclude\NFUtility.h" />
+    <ClInclude Include="HeadFiles\NFCommon\NFCommonInclude.h" />
+    <ClInclude Include="HeadFiles\NFCommon\NFSetting.h" />
+    <ClInclude Include="HeadFiles\NFCommon\NFUtility.h" />
     <ClInclude Include="HeadFiles\NFDXRender\NFDXRender.h" />
     <ClInclude Include="HeadFiles\NFWindow\NFWindow.h" />
   </ItemGroup>

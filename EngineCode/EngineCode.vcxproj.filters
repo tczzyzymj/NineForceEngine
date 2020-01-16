@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\NFCommonInclude">
-      <UniqueIdentifier>{d763e10d-bf60-43aa-beb6-bf3e655e97f7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\NFWindow">
       <UniqueIdentifier>{92da240c-3968-466f-ad9a-112c7154cde1}</UniqueIdentifier>
     </Filter>
@@ -28,6 +25,12 @@
     <Filter Include="Source Files\NFDXRender">
       <UniqueIdentifier>{83578e71-f8c4-4cc6-8f3b-2110a0d56495}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\NFCommon">
+      <UniqueIdentifier>{d763e10d-bf60-43aa-beb6-bf3e655e97f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NFCommon">
+      <UniqueIdentifier>{51f14c46-b4f7-4ca6-8e50-9cf6a7487110}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -39,22 +42,25 @@
     <ClCompile Include="SourceFiles\NFDXRender\NFDXRender.cpp">
       <Filter>Source Files\NFDXRender</Filter>
     </ClCompile>
+    <ClCompile Include="SourceFiles\NFCommon\NFUtility.cpp">
+      <Filter>Source Files\NFCommon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HeadFiles\CommonInclude\NFCommonInclude.h">
-      <Filter>Header Files\NFCommonInclude</Filter>
-    </ClInclude>
     <ClInclude Include="HeadFiles\NFWindow\NFWindow.h">
       <Filter>Header Files\NFWindow</Filter>
-    </ClInclude>
-    <ClInclude Include="HeadFiles\NFCommonInclude\NFUtility.h">
-      <Filter>Header Files\NFCommonInclude</Filter>
     </ClInclude>
     <ClInclude Include="HeadFiles\NFDXRender\NFDXRender.h">
       <Filter>Header Files\NFDXRender</Filter>
     </ClInclude>
-    <ClInclude Include="HeadFiles\NFCommonInclude\NFSetting.h">
-      <Filter>Header Files\NFCommonInclude</Filter>
+    <ClInclude Include="HeadFiles\NFCommon\NFCommonInclude.h">
+      <Filter>Header Files\NFCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\NFCommon\NFSetting.h">
+      <Filter>Header Files\NFCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\NFCommon\NFUtility.h">
+      <Filter>Header Files\NFCommon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

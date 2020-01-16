@@ -1,5 +1,6 @@
 #include "NFCommonInclude.h"
 #include "NFWindow/NFWindow.h"
+#include "NFUtility.h"
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
@@ -15,11 +16,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 
         return _window->Run();
     }
-    catch (std::exception _e)
+    catch (NFException& _exception)
     {
         MessageBox(
             nullptr,
-            NFUtility::GetInstance().AnsiToUnicode(_e.what()),
+            _exception.ToString().c_str(),
             L"Error",
             MB_OK
         );
