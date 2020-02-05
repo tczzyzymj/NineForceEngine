@@ -3,6 +3,7 @@
 #include <vector>
 #include "NFSetting.h"
 #include "DirectXColors.h"
+#include "DirectXMath.h"
 
 
 using Microsoft::WRL::ComPtr;
@@ -175,15 +176,52 @@ bool NFDXRender::Init(HWND targetHwnd)
         return false;
     }
 
-    if (!CreateRtvAndDsvDescriptionHeaps())
+    if (!BuildRtvAndDsvDescriptionHeaps())
     {
         return false;
     }
 
-    if (!BuildPipleState())
+    ThrowIfFailed(mCommandList->Reset(mCommandAllocator.Get(), nullptr));
+
+    // build constant buffer descriptor heaps
+    if (!BuildCbvDescriptionHeaps())
     {
         return false;
     }
+
+    // build constant buffer
+    if (!BuildConstantBuffer())
+    {
+        return false;
+    }
+
+    if (!BuildRootSignature())
+    {
+        return false;
+    }
+
+    if (!BuildShadersAndInputLayout())
+    {
+        return false;
+    }
+
+    if (!BuildBoxGeometry())
+    {
+        return false;
+    }
+
+    if (!BuildPipelineState())
+    {
+        return false;
+    }
+
+    ThrowIfFailed(mCommandList->Close());
+
+    ID3D12CommandList* _cmdArray[] = {mCommandList.Get()};
+
+    mCommandQueue->ExecuteCommandLists(_countof(_cmdArray), _cmdArray);
+
+    FlushCommandQueue();
 
     return true;
 }
@@ -339,7 +377,7 @@ bool NFDXRender::CreateSwapChain(HWND targetHwnd)
 }
 
 
-bool NFDXRender::CreateRtvAndDsvDescriptionHeaps()
+bool NFDXRender::BuildRtvAndDsvDescriptionHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC _rtvHeapDesc;
 
@@ -383,7 +421,81 @@ bool NFDXRender::CreateRtvAndDsvDescriptionHeaps()
 }
 
 
-bool NFDXRender::BuildPipleState()
+bool NFDXRender::BuildCbvDescriptionHeaps()
+{
+    D3D12_DESCRIPTOR_HEAP_DESC _desc = {};
+
+    ZeroMemory(&_desc, sizeof(_desc));
+
+    _desc.NumDescriptors = 1;
+    _desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    _desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    _desc.NodeMask = 0;
+
+    ThrowIfFailed(mDevice->CreateDescriptorHeap(&_desc, IID_PPV_ARGS(mCbvHeap.GetAddressOf())));
+
+    return true;
+}
+
+
+bool NFDXRender::BuildConstantBuffer()
+{
+    mObjCB = std::make_unique<NFUploadBuffer<ObjectConstants>>(mDevice.Get(), 1, true);
+
+    D3D12_GPU_VIRTUAL_ADDRESS _cbAdress = mObjCB->Resource()->GetGPUVirtualAddress();
+
+    int _boxBufferIndex = 0;
+
+    UINT _tempSize = sizeof(ObjectConstants);
+
+    _cbAdress += _boxBufferIndex * NFUtility::Ins().CalcConstantBufferByteSize(_tempSize);
+
+    D3D12_CONSTANT_BUFFER_VIEW_DESC _cbvDesc;
+    _cbvDesc.BufferLocation = _cbAdress;
+    _cbvDesc.SizeInBytes = _tempSize;
+
+
+    mDevice->CreateConstantBufferView(
+        &_cbvDesc,
+        mCbvHeap->GetCPUDescriptorHandleForHeapStart()
+    );
+
+    return true;
+}
+
+
+bool NFDXRender::BuildRootSignature()
+{
+    return true;
+}
+
+
+bool NFDXRender::BuildShadersAndInputLayout()
+{
+    return true;
+}
+
+
+bool NFDXRender::BuildBoxGeometry()
+{
+    return true;
+}
+
+
+bool NFDXRender::InitShader()
+{
+    mShaderManager = new NFShaderManager();
+
+    if (mShaderManager == nullptr)
+    {
+        return false;
+    }
+
+    return mShaderManager->Init();
+}
+
+
+bool NFDXRender::BuildPipelineState()
 {
     D3D12_GRAPHICS_PIPELINE_STATE_DESC _desc = {};
 

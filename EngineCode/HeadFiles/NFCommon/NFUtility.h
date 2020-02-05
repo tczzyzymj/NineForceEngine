@@ -32,7 +32,7 @@ private:
     std::wstring mFunctionName;
 
 
-    UINT mLineNumber = 0;;
+    UINT mLineNumber = 0;
 };
 
 #ifndef ThrowIfFailed
@@ -66,6 +66,9 @@ public:
 
     //将宽字节wchar_t*转化为单字节char*  
     char* UnicodeToAnsi(const wchar_t* szStr);
+
+
+    UINT CalcConstantBufferByteSize(UINT targetSize);
 
 
 private:

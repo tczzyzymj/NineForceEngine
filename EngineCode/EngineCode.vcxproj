@@ -152,13 +152,18 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SourceFiles\NFCommon\NFUtility.cpp" />
     <ClCompile Include="SourceFiles\NFDXRender\NFDXRender.cpp" />
+    <ClCompile Include="SourceFiles\NFShader\NFCommonShader.cpp" />
+    <ClCompile Include="SourceFiles\NFShader\NFShaderManager.cpp" />
     <ClCompile Include="SourceFiles\NFWindow\NFWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="HeadFiles\NFBuffer\NFUploadBuffer.h" />
     <ClInclude Include="HeadFiles\NFCommon\NFCommonInclude.h" />
     <ClInclude Include="HeadFiles\NFCommon\NFSetting.h" />
     <ClInclude Include="HeadFiles\NFCommon\NFUtility.h" />
     <ClInclude Include="HeadFiles\NFDXRender\NFDXRender.h" />
+    <ClInclude Include="HeadFiles\NFShader\NFCommonShader.h" />
+    <ClInclude Include="HeadFiles\NFShader\NFShaderManager.h" />
     <ClInclude Include="HeadFiles\NFWindow\NFWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

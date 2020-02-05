@@ -1,8 +1,16 @@
 #pragma once
 #include "NFCommonInclude.h"
-
+#include <vector>
+#include "NFShader/NFShaderManager.h"
+#include "NFBuffer/NFUploadBuffer.h"
 
 using Microsoft::WRL::ComPtr;
+
+
+struct ObjectConstants
+{
+    DirectX::XMFLOAT4X4 WorldViewProj;
+};
 
 
 class NFDXRender
@@ -23,16 +31,35 @@ public:
     bool CreateSwapChain(HWND targetHwnd);
 
 
-    bool CreateRtvAndDsvDescriptionHeaps();
+    bool BuildRtvAndDsvDescriptionHeaps();
 
 
-    bool BuildPipleState();
+    bool BuildCbvDescriptionHeaps();
+
+
+    bool BuildConstantBuffer();
+
+
+    bool BuildRootSignature();
+
+
+    bool BuildShadersAndInputLayout();
+
+
+    bool BuildBoxGeometry();
+
+
+    bool InitShader();
+
+
+    bool BuildPipelineState();
 
 
     bool Render();
 
 
     bool OnResize();
+
 
     ID3D12Resource* const CurrentBackBuffer();
 
@@ -72,6 +99,9 @@ private:
     static const UINT mSwapChainBufferCount = 2;
 
 
+    std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
+
+
     D3D12_VIEWPORT mScreenViewport;
 
 
@@ -79,6 +109,9 @@ private:
 
 
     UINT64 mCurrentFence = 0;
+
+
+    NFShaderManager* mShaderManager = nullptr;
 
 
     ComPtr<IDXGIFactory4> mFactory = nullptr;
@@ -105,14 +138,20 @@ private:
     ComPtr<ID3D12PipelineState> mPipeLineState = nullptr;
 
 
-    ComPtr<ID3D12DescriptorHeap> mRtvHeap;
+    ComPtr<ID3D12DescriptorHeap> mRtvHeap = nullptr;
 
 
-    ComPtr<ID3D12DescriptorHeap> mDsvHeap;
+    ComPtr<ID3D12DescriptorHeap> mDsvHeap = nullptr;
+
+
+    ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
 
 
     ComPtr<ID3D12Resource> mSwapChainBuffer[mSwapChainBufferCount];
 
 
-    ComPtr<ID3D12Resource> mDepthStencilBuffer;
+    ComPtr<ID3D12Resource> mDepthStencilBuffer = nullptr;
+
+
+    std::unique_ptr<NFUploadBuffer<ObjectConstants>> mObjCB;
 };

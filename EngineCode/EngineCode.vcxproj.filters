@@ -31,6 +31,15 @@
     <Filter Include="Source Files\NFCommon">
       <UniqueIdentifier>{51f14c46-b4f7-4ca6-8e50-9cf6a7487110}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\NFShader">
+      <UniqueIdentifier>{55a632ee-34e5-4751-a54e-012c6fe91bae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NFShader">
+      <UniqueIdentifier>{81329aa4-9914-4c6f-9257-63318a6c53ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NFBuffer">
+      <UniqueIdentifier>{b76a5350-7336-4360-87fe-6dacdb076835}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -44,6 +53,12 @@
     </ClCompile>
     <ClCompile Include="SourceFiles\NFCommon\NFUtility.cpp">
       <Filter>Source Files\NFCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\NFShader\NFShaderManager.cpp">
+      <Filter>Source Files\NFShader</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\NFShader\NFCommonShader.cpp">
+      <Filter>Source Files\NFShader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +76,15 @@
     </ClInclude>
     <ClInclude Include="HeadFiles\NFCommon\NFUtility.h">
       <Filter>Header Files\NFCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\NFShader\NFShaderManager.h">
+      <Filter>Header Files\NFShader</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\NFShader\NFCommonShader.h">
+      <Filter>Header Files\NFShader</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\NFBuffer\NFUploadBuffer.h">
+      <Filter>Header Files\NFBuffer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

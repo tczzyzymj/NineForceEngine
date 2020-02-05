@@ -11,6 +11,7 @@
 #include <dxgi1_4.h>
 #include <stdio.h>
 #include <string.h>
+#include "DirectXMath.h"
 
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")

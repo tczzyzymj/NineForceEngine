@@ -94,3 +94,9 @@ char* NFUtility::UnicodeToAnsi(const wchar_t* szStr)
     return _resultPtr;
 }
 
+
+UINT NFUtility::CalcConstantBufferByteSize(UINT targetSize)
+{
+    return (targetSize + 255) & ~255;
+}
+
