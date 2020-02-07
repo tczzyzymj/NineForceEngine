@@ -40,6 +40,9 @@
     <Filter Include="Header Files\NFBuffer">
       <UniqueIdentifier>{b76a5350-7336-4360-87fe-6dacdb076835}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{b74117b2-c19a-45ef-88df-506c745cb8aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">

@@ -147,6 +147,15 @@ private:
     ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
 
 
+    ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
+
+
+    ComPtr<ID3DBlob> mVertexShader = nullptr;
+
+
+    ComPtr<ID3DBlob> mPixShader = nullptr;
+
+
     ComPtr<ID3D12Resource> mSwapChainBuffer[mSwapChainBufferCount];
 
 

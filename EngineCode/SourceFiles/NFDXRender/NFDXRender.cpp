@@ -184,36 +184,18 @@ bool NFDXRender::Init(HWND targetHwnd)
     ThrowIfFailed(mCommandList->Reset(mCommandAllocator.Get(), nullptr));
 
     // build constant buffer descriptor heaps
-    if (!BuildCbvDescriptionHeaps())
-    {
-        return false;
-    }
+    ThrowIfFailed(!BuildCbvDescriptionHeaps());
 
     // build constant buffer
-    if (!BuildConstantBuffer())
-    {
-        return false;
-    }
+    ThrowIfFailed(!BuildConstantBuffer());
 
-    if (!BuildRootSignature())
-    {
-        return false;
-    }
+    ThrowIfFailed(!BuildRootSignature());
 
-    if (!BuildShadersAndInputLayout())
-    {
-        return false;
-    }
+    ThrowIfFailed(!BuildShadersAndInputLayout());
 
-    if (!BuildBoxGeometry())
-    {
-        return false;
-    }
+    ThrowIfFailed(!BuildBoxGeometry());
 
-    if (!BuildPipelineState())
-    {
-        return false;
-    }
+    ThrowIfFailed(!BuildPipelineState());
 
     ThrowIfFailed(mCommandList->Close());
 
@@ -446,9 +428,9 @@ bool NFDXRender::BuildConstantBuffer()
 
     int _boxBufferIndex = 0;
 
-    UINT _tempSize = sizeof(ObjectConstants);
+    UINT _tempSize = NFUtility::Ins().CalcConstantBufferByteSize(sizeof(ObjectConstants));
 
-    _cbAdress += _boxBufferIndex * NFUtility::Ins().CalcConstantBufferByteSize(_tempSize);
+    _cbAdress += _boxBufferIndex * _tempSize;
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC _cbvDesc;
     _cbvDesc.BufferLocation = _cbAdress;
@@ -466,12 +448,103 @@ bool NFDXRender::BuildConstantBuffer()
 
 bool NFDXRender::BuildRootSignature()
 {
+    D3D12_ROOT_PARAMETER _rootParams[1];
+
+    D3D12_DESCRIPTOR_RANGE _cbvTable;
+    ZeroMemory(&_cbvTable, sizeof(_cbvTable));
+
+    _cbvTable.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+    _cbvTable.NumDescriptors = 1;
+    _cbvTable.BaseShaderRegister = 0;
+    _cbvTable.RegisterSpace = 0;
+    _cbvTable.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+    _rootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    _rootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+    _rootParams[0].DescriptorTable.NumDescriptorRanges = 1;
+    _rootParams[0].DescriptorTable.pDescriptorRanges = &_cbvTable;
+
+    D3D12_ROOT_SIGNATURE_DESC _rootSignDesc = {};
+    ZeroMemory(&_rootSignDesc, sizeof(_rootSignDesc));
+
+    _rootSignDesc.NumParameters = 1;
+    _rootSignDesc.pParameters = _rootParams;
+    _rootSignDesc.NumStaticSamplers = 0;
+    _rootSignDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+    _rootSignDesc.pStaticSamplers = nullptr;
+
+    ComPtr<ID3DBlob> _serializedRootSign = nullptr;
+    ComPtr<ID3DBlob> _errorBlob = nullptr;
+
+    HRESULT _tempResult = D3D12SerializeRootSignature(
+        &_rootSignDesc,
+        D3D_ROOT_SIGNATURE_VERSION_1,
+        _serializedRootSign.GetAddressOf(),
+        _errorBlob.GetAddressOf()
+    );
+
+    if (_errorBlob != nullptr)
+    {
+#ifdef UNICODE
+        OutputDebugStringW(static_cast<wchar_t*>(_errorBlob->GetBufferPointer()));
+#else
+        OutputDebugStringA(static_cast<char*>(_errorBlob->GetBufferPointer()));
+#endif
+    }
+
+    ThrowIfFailed(_tempResult);
+
+    ThrowIfFailed(
+        mDevice->CreateRootSignature(
+            0,
+            _serializedRootSign->GetBufferPointer(),
+            _serializedRootSign->GetBufferSize(),
+            IID_PPV_ARGS(mRootSignature.GetAddressOf())
+        )
+    );
+
     return true;
 }
 
 
 bool NFDXRender::BuildShadersAndInputLayout()
 {
+    mVertexShader = mShaderManager->CompileShader(
+        L"ShaderFiles\\SimpleColor.hlsl",
+        "VS",
+        "vs_5_0",
+        nullptr
+    );
+
+    mPixShader = mShaderManager->CompileShader(
+        L"ShaderFiles\\SimpleColor.hlsl",
+        "PS",
+        "ps_5_0",
+        nullptr
+    );
+
+    mInputLayout =
+    {
+        {
+            "POSITION",
+            0,
+            DXGI_FORMAT_R32G32B32_FLOAT,
+            0,
+            0,
+            D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+            0
+        },
+        {
+            "COLOR",
+            0,
+            DXGI_FORMAT_R32G32B32A32_FLOAT,
+            0,
+            12,
+            D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+            0
+        }
+    };
+
     return true;
 }
 
