@@ -23,7 +23,7 @@ std::wstring NFException::ToString() const
 
     std::wstring _msg = _error.ErrorMessage();
 
-    return L"Call [" + mFunctionName + L"] failed ! \n" +
+    return L"Call Method : [ " + mFunctionName + L" ] Failed ! \n" +
         L" In : [" + mFileName + L"] ; Line : " + std::to_wstring(mLineNumber) +
         L".\n Error message : " + _msg;
 }
