@@ -7,6 +7,7 @@
 
 
 using Microsoft::WRL::ComPtr;
+using namespace DirectX;
 
 
 NFDXRender::NFDXRender()
@@ -551,6 +552,349 @@ bool NFDXRender::BuildShadersAndInputLayout()
 
 bool NFDXRender::BuildBoxGeometry()
 {
+    std::array<Vertex, 8> _vertices =
+    {
+        Vertex({XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White)}),
+        Vertex({XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black)}),
+        Vertex({XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red)}),
+        Vertex({XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green)}),
+        Vertex({XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue)}),
+        Vertex({XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow)}),
+        Vertex({XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan)}),
+        Vertex({XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta)})
+    };
+
+    std::array<std::uint16_t, 36> _indices =
+    {
+        // front face
+        0,
+        1,
+        2,
+        0,
+        2,
+        3,
+
+        // back face
+        4,
+        6,
+        5,
+        4,
+        7,
+        6,
+
+        // left face
+        4,
+        5,
+        1,
+        4,
+        1,
+        0,
+
+        // right face
+        3,
+        2,
+        6,
+        3,
+        6,
+        7,
+
+        // top face
+        1,
+        5,
+        6,
+        1,
+        6,
+        2,
+
+        // bottom face
+        4,
+        0,
+        3,
+        4,
+        3,
+        7
+    };
+
+    const UINT _vbByteSize = static_cast<UINT>(_vertices.size()) * sizeof(Vertex);
+
+    const UINT _idByteSize = static_cast<UINT>(_indices.size()) * sizeof(std::uint16_t);
+
+    mBoxMesh = std::make_unique<NFMesh>();
+
+    mBoxMesh->SetName(L"BoxMesh");
+
+    ThrowIfFailed(D3DCreateBlob(_vbByteSize, &mBoxMesh->VertexBufferCPU));
+    CopyMemory(mBoxMesh->VertexBufferCPU->GetBufferPointer(), _vertices.data(), _vbByteSize);
+
+    ThrowIfFailed(D3DCreateBlob(_idByteSize, &mBoxMesh->IndexBufferCPU));
+    CopyMemory(mBoxMesh->IndexBufferCPU->GetBufferPointer(), _indices.data(), _idByteSize);
+
+    // create vertex GPU buffer and uploader
+    {
+        // create gpu buffer
+        {
+            D3D12_HEAP_PROPERTIES _heapProperties;
+            _heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+            _heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            _heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+            _heapProperties.CreationNodeMask = 1;
+            _heapProperties.VisibleNodeMask = 1;
+
+            D3D12_RESOURCE_DESC _resourceDesc;
+            _resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            _resourceDesc.Alignment = 0;
+            _resourceDesc.Width = _vbByteSize;
+            _resourceDesc.Height = 1;
+            _resourceDesc.DepthOrArraySize = 1;
+            _resourceDesc.MipLevels = 1;
+            _resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+            _resourceDesc.SampleDesc.Count = 1;
+            _resourceDesc.SampleDesc.Quality = 0;
+            _resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            _resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+            ThrowIfFailed(
+                mDevice->CreateCommittedResource(
+                    &_heapProperties,
+                    D3D12_HEAP_FLAG_NONE,
+                    &_resourceDesc,
+                    D3D12_RESOURCE_STATE_COMMON,
+                    nullptr,
+                    IID_PPV_ARGS(mBoxMesh->VertexBufferGPU.GetAddressOf())
+                )
+            );
+        }
+
+        // create uploader
+        {
+            D3D12_HEAP_PROPERTIES _heapProperties;
+            _heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+            _heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            _heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+            _heapProperties.CreationNodeMask = 1;
+            _heapProperties.VisibleNodeMask = 1;
+
+            D3D12_RESOURCE_DESC _resourceDesc;
+            _resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            _resourceDesc.Alignment = 0;
+            _resourceDesc.Width = _vbByteSize;
+            _resourceDesc.Height = 1;
+            _resourceDesc.DepthOrArraySize = 1;
+            _resourceDesc.MipLevels = 1;
+            _resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+            _resourceDesc.SampleDesc.Count = 1;
+            _resourceDesc.SampleDesc.Quality = 0;
+            _resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            _resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+            ThrowIfFailed(
+                mDevice->CreateCommittedResource(
+                    &_heapProperties,
+                    D3D12_HEAP_FLAG_NONE,
+                    &_resourceDesc,
+                    D3D12_RESOURCE_STATE_GENERIC_READ,
+                    nullptr,
+                    IID_PPV_ARGS(mBoxMesh->VertexBufferUploader.GetAddressOf())
+                )
+            );
+        }
+
+        // begin barrier
+        {
+            D3D12_SUBRESOURCE_DATA _desc = {};
+            ZeroMemory(&_desc, sizeof(_desc));
+
+            _desc.pData = _vertices.data();
+            _desc.RowPitch = _vbByteSize;
+            _desc.SlicePitch = _desc.RowPitch;
+
+            D3D12_RESOURCE_BARRIER _barrierDesc = {};
+            ZeroMemory(&_barrierDesc, sizeof(_barrierDesc));
+            _barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+            _barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+            _barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
+            _barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+            _barrierDesc.Transition.pResource = mBoxMesh->VertexBufferGPU.Get();
+            _barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+            mCommandList->ResourceBarrier(
+                1,
+                &_barrierDesc
+            );
+        }
+
+        // update subresource
+        do
+        {
+            UINT _numberOfSubresource = 1;
+            UINT _firstSubresource = 0;
+
+            UINT64 _requiredSize = 0;
+            UINT64 _memToAlloc = static_cast<UINT64>(sizeof(D3D12_PLACED_SUBRESOURCE_FOOTPRINT) +
+                    sizeof(UINT) +
+                    sizeof(UINT64)) *
+                _numberOfSubresource;
+
+            if (_memToAlloc > SIZE_MAX)
+            {
+                MessageBox(nullptr, L"Error", L"Allocate to large size !", MB_OK);
+
+                break;
+            }
+
+            void* _pAllocatedMemory = HeapAlloc(GetProcessHeap(), 0, static_cast<SIZE_T>(_memToAlloc));
+            if (_pAllocatedMemory == nullptr)
+            {
+                MessageBox(nullptr, L"Error", L"Allocate memory failed!", MB_OK);
+
+                break;
+            }
+
+            auto* _pLayouts = reinterpret_cast<D3D12_PLACED_SUBRESOURCE_FOOTPRINT*>(_pAllocatedMemory);
+            UINT64* _pRowSizeInbytes = reinterpret_cast<UINT64*>(_pLayouts + _numberOfSubresource);
+            UINT* _pNumRows = reinterpret_cast<UINT*>(_pRowSizeInbytes + _numberOfSubresource);
+
+            D3D12_RESOURCE_DESC _desc = mBoxMesh->VertexBufferGPU->GetDesc();
+
+            ID3D12Device* _pDevice = nullptr;
+
+            mBoxMesh->VertexBufferGPU->GetDevice(
+                __uuidof(*_pDevice),
+                reinterpret_cast<void**>(&_pDevice)
+            );
+
+            _pDevice->GetCopyableFootprints(
+                &_desc,
+                _firstSubresource,
+                _numberOfSubresource,
+                0,
+                _pLayouts,
+                _pNumRows,
+                _pRowSizeInbytes,
+                &_requiredSize
+            );
+
+            _pDevice->Release();
+
+            // real upload subresource
+            {
+                D3D12_RESOURCE_DESC _uploaderDesc = mBoxMesh->VertexBufferUploader->GetDesc();
+                D3D12_RESOURCE_DESC _destinationDesc = mBoxMesh->VertexBufferGPU->GetDesc();
+
+                if (_uploaderDesc.Dimension != D3D12_RESOURCE_DIMENSION_BUFFER ||
+                    _uploaderDesc.Width < (_requiredSize + _pLayouts[0].Offset) ||
+                    _requiredSize > static_cast<SIZE_T>(-1) ||
+                    (_destinationDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER &&
+                        (_firstSubresource != 0 || _numberOfSubresource != 1)))
+                {
+                    MessageBox(nullptr, L"Error", L"Arguments error!", MB_OK);
+
+                    break;
+                }
+
+                BYTE* _pData = nullptr;
+            }
+
+            HeapFree(GetProcessHeap(), 0, _pAllocatedMemory);
+        }
+        while (false);
+
+        // end barrier
+        {
+            D3D12_SUBRESOURCE_DATA _desc = {};
+            ZeroMemory(&_desc, sizeof(_desc));
+
+            _desc.pData = _vertices.data();
+            _desc.RowPitch = _vbByteSize;
+            _desc.SlicePitch = _desc.RowPitch;
+
+            D3D12_RESOURCE_BARRIER _barrierDesc = {};
+            ZeroMemory(&_barrierDesc, sizeof(_barrierDesc));
+            _barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+            _barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+            _barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+            _barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+            _barrierDesc.Transition.pResource = mBoxMesh->VertexBufferGPU.Get();
+            _barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+            mCommandList->ResourceBarrier(
+                1,
+                &_barrierDesc
+            );
+        }
+    }
+
+    // create index GPU buffer and uploader
+    {
+        // create gpu buffer
+        {
+            D3D12_HEAP_PROPERTIES _heapProperties;
+            _heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+            _heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            _heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+            _heapProperties.CreationNodeMask = 1;
+            _heapProperties.VisibleNodeMask = 1;
+
+            D3D12_RESOURCE_DESC _resourceDesc;
+            _resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            _resourceDesc.Alignment = 0;
+            _resourceDesc.Width = _vbByteSize;
+            _resourceDesc.Height = 1;
+            _resourceDesc.DepthOrArraySize = 1;
+            _resourceDesc.MipLevels = 1;
+            _resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+            _resourceDesc.SampleDesc.Count = 1;
+            _resourceDesc.SampleDesc.Quality = 0;
+            _resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            _resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+            ThrowIfFailed(
+                mDevice->CreateCommittedResource(
+                    &_heapProperties,
+                    D3D12_HEAP_FLAG_NONE,
+                    &_resourceDesc,
+                    D3D12_RESOURCE_STATE_COMMON,
+                    nullptr,
+                    IID_PPV_ARGS(mBoxMesh->IndexBufferGPU.GetAddressOf())
+                )
+            );
+        }
+
+        // create uploader
+        {
+            D3D12_HEAP_PROPERTIES _heapProperties;
+            _heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+            _heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            _heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+            _heapProperties.CreationNodeMask = 1;
+            _heapProperties.VisibleNodeMask = 1;
+
+            D3D12_RESOURCE_DESC _resourceDesc;
+            _resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            _resourceDesc.Alignment = 0;
+            _resourceDesc.Width = _vbByteSize;
+            _resourceDesc.Height = 1;
+            _resourceDesc.DepthOrArraySize = 1;
+            _resourceDesc.MipLevels = 1;
+            _resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+            _resourceDesc.SampleDesc.Count = 1;
+            _resourceDesc.SampleDesc.Quality = 0;
+            _resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            _resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+            ThrowIfFailed(
+                mDevice->CreateCommittedResource(
+                    &_heapProperties,
+                    D3D12_HEAP_FLAG_NONE,
+                    &_resourceDesc,
+                    D3D12_RESOURCE_STATE_GENERIC_READ,
+                    nullptr,
+                    IID_PPV_ARGS(mBoxMesh->IndexBufferUploader.GetAddressOf())
+                )
+            );
+        }
+    }
+
     return true;
 }
 

@@ -3,6 +3,11 @@
 #include <vector>
 #include "NFShader/NFShaderManager.h"
 #include "NFBuffer/NFUploadBuffer.h"
+#include "NFMesh/NFMesh.h"
+
+#pragma comment(lib,"d3dcompiler.lib")
+#pragma comment(lib, "D3D12.lib")
+#pragma comment(lib, "dxgi.lib")
 
 using Microsoft::WRL::ComPtr;
 
@@ -10,6 +15,15 @@ using Microsoft::WRL::ComPtr;
 struct ObjectConstants
 {
     DirectX::XMFLOAT4X4 WorldViewProj;
+};
+
+
+struct Vertex
+{
+    DirectX::XMFLOAT3 Pos;
+
+
+    DirectX::XMFLOAT4 Color;
 };
 
 
@@ -163,4 +177,7 @@ private:
 
 
     std::unique_ptr<NFUploadBuffer<ObjectConstants>> mObjCB;
+
+
+    std::unique_ptr<NFMesh> mBoxMesh;
 };

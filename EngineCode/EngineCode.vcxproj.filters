@@ -43,6 +43,12 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{b74117b2-c19a-45ef-88df-506c745cb8aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\NFMesh">
+      <UniqueIdentifier>{06d7eb10-3538-4a49-a883-c4222f40f62f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NFMesh">
+      <UniqueIdentifier>{20f970a4-a9c8-4715-9fe9-854a306c0a4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -62,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="SourceFiles\NFShader\NFCommonShader.cpp">
       <Filter>Source Files\NFShader</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\NFMesh\NFMesh.cpp">
+      <Filter>Source Files\NFMesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="HeadFiles\NFBuffer\NFUploadBuffer.h">
       <Filter>Header Files\NFBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="HeadFiles\NFMesh\NFMesh.h">
+      <Filter>Header Files\NFMesh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

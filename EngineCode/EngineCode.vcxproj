@@ -156,6 +156,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SourceFiles\NFCommon\NFUtility.cpp" />
     <ClCompile Include="SourceFiles\NFDXRender\NFDXRender.cpp" />
+    <ClCompile Include="SourceFiles\NFMesh\NFMesh.cpp" />
     <ClCompile Include="SourceFiles\NFShader\NFCommonShader.cpp" />
     <ClCompile Include="SourceFiles\NFShader\NFShaderManager.cpp" />
     <ClCompile Include="SourceFiles\NFWindow\NFWindow.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="HeadFiles\NFCommon\NFSetting.h" />
     <ClInclude Include="HeadFiles\NFCommon\NFUtility.h" />
     <ClInclude Include="HeadFiles\NFDXRender\NFDXRender.h" />
+    <ClInclude Include="HeadFiles\NFMesh\NFMesh.h" />
     <ClInclude Include="HeadFiles\NFShader\NFCommonShader.h" />
     <ClInclude Include="HeadFiles\NFShader\NFShaderManager.h" />
     <ClInclude Include="HeadFiles\NFWindow\NFWindow.h" />
