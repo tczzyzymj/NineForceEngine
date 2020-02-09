@@ -701,13 +701,6 @@ bool NFDXRender::BuildBoxGeometry()
 
         // begin barrier
         {
-            D3D12_SUBRESOURCE_DATA _desc = {};
-            ZeroMemory(&_desc, sizeof(_desc));
-
-            _desc.pData = _vertices.data();
-            _desc.RowPitch = _vbByteSize;
-            _desc.SlicePitch = _desc.RowPitch;
-
             D3D12_RESOURCE_BARRIER _barrierDesc = {};
             ZeroMemory(&_barrierDesc, sizeof(_barrierDesc));
             _barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -728,12 +721,14 @@ bool NFDXRender::BuildBoxGeometry()
         {
             UINT _numberOfSubresource = 1;
             UINT _firstSubresource = 0;
+            UINT _baseOffset = 0;
 
             UINT64 _requiredSize = 0;
-            UINT64 _memToAlloc = static_cast<UINT64>(sizeof(D3D12_PLACED_SUBRESOURCE_FOOTPRINT) +
-                    sizeof(UINT) +
-                    sizeof(UINT64)) *
-                _numberOfSubresource;
+            UINT64 _memToAlloc = static_cast<UINT64>(
+                sizeof(D3D12_PLACED_SUBRESOURCE_FOOTPRINT) +
+                sizeof(UINT) +
+                sizeof(UINT64)
+            ) * _numberOfSubresource;
 
             if (_memToAlloc > SIZE_MAX)
             {
@@ -750,9 +745,9 @@ bool NFDXRender::BuildBoxGeometry()
                 break;
             }
 
-            auto* _pLayouts = reinterpret_cast<D3D12_PLACED_SUBRESOURCE_FOOTPRINT*>(_pAllocatedMemory);
-            UINT64* _pRowSizeInbytes = reinterpret_cast<UINT64*>(_pLayouts + _numberOfSubresource);
-            UINT* _pNumRows = reinterpret_cast<UINT*>(_pRowSizeInbytes + _numberOfSubresource);
+            auto _pLayouts = reinterpret_cast<D3D12_PLACED_SUBRESOURCE_FOOTPRINT*>(_pAllocatedMemory);
+            auto _pRowSizeInbytes = reinterpret_cast<UINT64*>(_pLayouts + _numberOfSubresource);
+            auto _pNumRows = reinterpret_cast<UINT*>(_pRowSizeInbytes + _numberOfSubresource);
 
             D3D12_RESOURCE_DESC _desc = mBoxMesh->VertexBufferGPU->GetDesc();
 
@@ -767,7 +762,7 @@ bool NFDXRender::BuildBoxGeometry()
                 &_desc,
                 _firstSubresource,
                 _numberOfSubresource,
-                0,
+                _baseOffset,
                 _pLayouts,
                 _pNumRows,
                 _pRowSizeInbytes,
@@ -793,6 +788,79 @@ bool NFDXRender::BuildBoxGeometry()
                 }
 
                 BYTE* _pData = nullptr;
+
+                auto _tempResult = mBoxMesh->VertexBufferUploader->Map(
+                    0,
+                    nullptr,
+                    reinterpret_cast<void**>(&_pData)
+                );
+
+                if (FAILED(_tempResult))
+                {
+                    MessageBox(nullptr, L"Error", L"Map data failed!", MB_OK);
+
+                    break;
+                }
+
+                bool _showContinue = true;
+
+                for (UINT _i = 0; _i < _numberOfSubresource; ++_i)
+                {
+                    if (_pRowSizeInbytes[_i] > (SIZE_T)-1)
+                    {
+                        _showContinue = false;
+
+                        break;
+                    }
+                }
+
+                if (!_showContinue)
+                {
+                    MessageBox(nullptr, L"Error", L"Copy sub resource failed!", MB_OK);
+
+                    break;
+                }
+
+                mBoxMesh->VertexBufferUploader->Unmap(0, nullptr);
+
+                if (_destinationDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER)
+                {
+                    D3D12_BOX _boxDesc = {};
+                    ZeroMemory(&_boxDesc, sizeof(_boxDesc));
+                    _boxDesc.top = 0;
+                    _boxDesc.front = 0;
+                    _boxDesc.bottom = 1;
+                    _boxDesc.back = 1;
+                    _boxDesc.left = static_cast<UINT>(_pLayouts[0].Offset);
+                    _boxDesc.right = static_cast<UINT>(_pLayouts[0].Offset + _pLayouts[0].Footprint.Width);
+
+                    mCommandList->CopyBufferRegion(
+                        mBoxMesh->VertexBufferGPU.Get(),
+                        0,
+                        mBoxMesh->VertexBufferUploader.Get(),
+                        _pLayouts[0].Offset,
+                        _pLayouts[0].Footprint.Width
+                    );
+                }
+                else
+                {
+                    for(UINT _i = 0; _i < _numberOfSubresource;++_i)
+                    {
+                        D3D12_TEXTURE_COPY_LOCATION _dest = {};
+                        ZeroMemory(&_dest, sizeof(_dest));
+                        _dest.pResource = mBoxMesh->VertexBufferGPU.Get();
+                        _dest.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+                        _dest.SubresourceIndex = _i + _baseOffset;
+
+                        D3D12_TEXTURE_COPY_LOCATION _src = {};
+                        ZeroMemory(&_src, sizeof(_src));
+                        _src.pResource = mBoxMesh->VertexBufferUploader.Get();
+                        _src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+                        _src.PlacedFootprint = _pLayouts[0];
+
+                        mCommandList->CopyTextureRegion(&_dest, 0, 0, 0, &_src, nullptr);
+                    }
+                }
             }
 
             HeapFree(GetProcessHeap(), 0, _pAllocatedMemory);
@@ -801,13 +869,6 @@ bool NFDXRender::BuildBoxGeometry()
 
         // end barrier
         {
-            D3D12_SUBRESOURCE_DATA _desc = {};
-            ZeroMemory(&_desc, sizeof(_desc));
-
-            _desc.pData = _vertices.data();
-            _desc.RowPitch = _vbByteSize;
-            _desc.SlicePitch = _desc.RowPitch;
-
             D3D12_RESOURCE_BARRIER _barrierDesc = {};
             ZeroMemory(&_barrierDesc, sizeof(_barrierDesc));
             _barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
