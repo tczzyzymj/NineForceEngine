@@ -804,13 +804,45 @@ bool NFDXRender::BuildBoxGeometry()
 
                 bool _showContinue = true;
 
+                D3D12_SUBRESOURCE_DATA _subresourceData = {};
+                _subresourceData.pData = _vertices.data();
+                _subresourceData.RowPitch = _vbByteSize;
+                _subresourceData.SlicePitch = _subresourceData.RowPitch;
+
                 for (UINT _i = 0; _i < _numberOfSubresource; ++_i)
                 {
-                    if (_pRowSizeInbytes[_i] > (SIZE_T)-1)
+                    if (_pRowSizeInbytes[_i] > static_cast<SIZE_T>(-1))
                     {
                         _showContinue = false;
 
                         break;
+                    }
+
+                    D3D12_MEMCPY_DEST _cpyDesc = {};
+                    ZeroMemory(&_cpyDesc, sizeof(_cpyDesc));
+                    _cpyDesc.pData = _pData + _pLayouts[_i].Offset;
+                    _cpyDesc.RowPitch = _pLayouts[_i].Footprint.RowPitch;
+                    _cpyDesc.SlicePitch = _pLayouts[_i].Footprint.RowPitch + _pNumRows[_i];
+
+                    UINT _numberSlice = _pLayouts[_i].Footprint.Depth;
+                    UINT _numberRows = _pNumRows[_i];
+                    auto _rowSizeBytes = static_cast<SIZE_T>(_pRowSizeInbytes[_i]);
+
+                    for (UINT _z = 0; _z = _numberSlice; ++_z)
+                    {
+                        BYTE* _pDestSlice = reinterpret_cast<BYTE*>(_cpyDesc.pData) + _cpyDesc.SlicePitch * _z;
+
+                        const BYTE* _pSrcSlice = reinterpret_cast<const BYTE*>(_subresourceData.pData) +
+                            _subresourceData.SlicePitch * _z;
+
+                        for (UINT _y = 0; _y < _numberRows; ++_y)
+                        {
+                            memcpy(
+                                _pDestSlice + _cpyDesc.RowPitch * _y,
+                                _pSrcSlice + _subresourceData.RowPitch * _y,
+                                _rowSizeBytes
+                            );
+                        }
                     }
                 }
 
@@ -844,7 +876,7 @@ bool NFDXRender::BuildBoxGeometry()
                 }
                 else
                 {
-                    for(UINT _i = 0; _i < _numberOfSubresource;++_i)
+                    for (UINT _i = 0; _i < _numberOfSubresource; ++_i)
                     {
                         D3D12_TEXTURE_COPY_LOCATION _dest = {};
                         ZeroMemory(&_dest, sizeof(_dest));
