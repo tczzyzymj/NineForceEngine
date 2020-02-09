@@ -87,9 +87,6 @@ public:
     ComPtr<ID3D12Resource> IndexBufferUploader = nullptr;
 
 
-    std::unordered_map<std::string, NFSubmeshGeometry> DrawArgs;
-
-
     UINT VertexByteStride = 0;
 
 
@@ -99,9 +96,20 @@ public:
     UINT IndexBufferByteSize = 0;
 
 
+    void AddSubGeometry(
+        std::wstring const& targetName,
+        UINT indexCount,
+        UINT startIndexLocation,
+        UINT baseVertexLocation
+    );
+
+
 private:
 
     std::wstring mName;
+
+
+    std::unordered_map<std::wstring, NFSubmeshGeometry> mSubMeshDataMap;
 
 
     DXGI_FORMAT mIndexFormat = DXGI_FORMAT_R16_UINT;

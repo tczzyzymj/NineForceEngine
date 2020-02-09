@@ -423,13 +423,13 @@ bool NFDXRender::BuildCbvDescriptionHeaps()
 
 bool NFDXRender::BuildConstantBuffer()
 {
-    mObjCB = std::make_unique<NFUploadBuffer<ObjectConstants>>(mDevice.Get(), 1, true);
+    mObjCB = std::make_unique<NFUploadBuffer<NFObjectConstants>>(mDevice.Get(), 1, true);
 
     D3D12_GPU_VIRTUAL_ADDRESS _cbAdress = mObjCB->Resource()->GetGPUVirtualAddress();
 
     int _boxBufferIndex = 0;
 
-    UINT _tempSize = NFUtility::Ins().CalcConstantBufferByteSize(sizeof(ObjectConstants));
+    UINT _tempSize = NFUtility::Ins().CalcConstantBufferByteSize(sizeof(NFObjectConstants));
 
     _cbAdress += _boxBufferIndex * _tempSize;
 
@@ -552,16 +552,16 @@ bool NFDXRender::BuildShadersAndInputLayout()
 
 bool NFDXRender::BuildBoxGeometry()
 {
-    std::array<Vertex, 8> _vertices =
+    std::array<NFVertex, 8> _vertices =
     {
-        Vertex({XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White)}),
-        Vertex({XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black)}),
-        Vertex({XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red)}),
-        Vertex({XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green)}),
-        Vertex({XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue)}),
-        Vertex({XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow)}),
-        Vertex({XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan)}),
-        Vertex({XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta)})
+        NFVertex({XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White)}),
+        NFVertex({XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black)}),
+        NFVertex({XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red)}),
+        NFVertex({XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green)}),
+        NFVertex({XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue)}),
+        NFVertex({XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow)}),
+        NFVertex({XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan)}),
+        NFVertex({XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta)})
     };
 
     std::array<std::uint16_t, 36> _indices =
@@ -615,7 +615,7 @@ bool NFDXRender::BuildBoxGeometry()
         7
     };
 
-    const UINT _vbByteSize = static_cast<UINT>(_vertices.size()) * sizeof(Vertex);
+    const UINT _vbByteSize = static_cast<UINT>(_vertices.size()) * sizeof(NFVertex);
 
     const UINT _idByteSize = static_cast<UINT>(_indices.size()) * sizeof(std::uint16_t);
 
@@ -826,73 +826,6 @@ bool NFDXRender::BuildBoxGeometry()
 
     // create index GPU buffer and uploader
     {
-        // create gpu buffer
-        {
-            D3D12_HEAP_PROPERTIES _heapProperties;
-            _heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-            _heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-            _heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-            _heapProperties.CreationNodeMask = 1;
-            _heapProperties.VisibleNodeMask = 1;
-
-            D3D12_RESOURCE_DESC _resourceDesc;
-            _resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-            _resourceDesc.Alignment = 0;
-            _resourceDesc.Width = _vbByteSize;
-            _resourceDesc.Height = 1;
-            _resourceDesc.DepthOrArraySize = 1;
-            _resourceDesc.MipLevels = 1;
-            _resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-            _resourceDesc.SampleDesc.Count = 1;
-            _resourceDesc.SampleDesc.Quality = 0;
-            _resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-            _resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-            ThrowIfFailed(
-                mDevice->CreateCommittedResource(
-                    &_heapProperties,
-                    D3D12_HEAP_FLAG_NONE,
-                    &_resourceDesc,
-                    D3D12_RESOURCE_STATE_COMMON,
-                    nullptr,
-                    IID_PPV_ARGS(mBoxMesh->IndexBufferGPU.GetAddressOf())
-                )
-            );
-        }
-
-        // create uploader
-        {
-            D3D12_HEAP_PROPERTIES _heapProperties;
-            _heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
-            _heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-            _heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-            _heapProperties.CreationNodeMask = 1;
-            _heapProperties.VisibleNodeMask = 1;
-
-            D3D12_RESOURCE_DESC _resourceDesc;
-            _resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-            _resourceDesc.Alignment = 0;
-            _resourceDesc.Width = _vbByteSize;
-            _resourceDesc.Height = 1;
-            _resourceDesc.DepthOrArraySize = 1;
-            _resourceDesc.MipLevels = 1;
-            _resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-            _resourceDesc.SampleDesc.Count = 1;
-            _resourceDesc.SampleDesc.Quality = 0;
-            _resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-            _resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-            ThrowIfFailed(
-                mDevice->CreateCommittedResource(
-                    &_heapProperties,
-                    D3D12_HEAP_FLAG_NONE,
-                    &_resourceDesc,
-                    D3D12_RESOURCE_STATE_GENERIC_READ,
-                    nullptr,
-                    IID_PPV_ARGS(mBoxMesh->IndexBufferUploader.GetAddressOf())
-                )
-            );
-        }
     }
 
     return true;

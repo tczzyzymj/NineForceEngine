@@ -12,13 +12,13 @@
 using Microsoft::WRL::ComPtr;
 
 
-struct ObjectConstants
+struct NFObjectConstants
 {
     DirectX::XMFLOAT4X4 WorldViewProj;
 };
 
 
-struct Vertex
+struct NFVertex
 {
     DirectX::XMFLOAT3 Pos;
 
@@ -176,7 +176,7 @@ private:
     ComPtr<ID3D12Resource> mDepthStencilBuffer = nullptr;
 
 
-    std::unique_ptr<NFUploadBuffer<ObjectConstants>> mObjCB;
+    std::unique_ptr<NFUploadBuffer<NFObjectConstants>> mObjCB;
 
 
     std::unique_ptr<NFMesh> mBoxMesh;
