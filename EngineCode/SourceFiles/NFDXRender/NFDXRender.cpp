@@ -634,6 +634,7 @@ bool NFDXRender::BuildBoxGeometry()
         // create gpu buffer
         {
             D3D12_HEAP_PROPERTIES _heapProperties;
+            ZeroMemory(&_heapProperties, sizeof(_heapProperties));
             _heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
             _heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
             _heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
@@ -641,6 +642,7 @@ bool NFDXRender::BuildBoxGeometry()
             _heapProperties.VisibleNodeMask = 1;
 
             D3D12_RESOURCE_DESC _resourceDesc;
+            ZeroMemory(&_resourceDesc, sizeof(_resourceDesc));
             _resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
             _resourceDesc.Alignment = 0;
             _resourceDesc.Width = _vbByteSize;
@@ -701,7 +703,7 @@ bool NFDXRender::BuildBoxGeometry()
 
         // begin barrier
         {
-            D3D12_RESOURCE_BARRIER _barrierDesc = {};
+            D3D12_RESOURCE_BARRIER _barrierDesc;
             ZeroMemory(&_barrierDesc, sizeof(_barrierDesc));
             _barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
             _barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -828,7 +830,7 @@ bool NFDXRender::BuildBoxGeometry()
                     UINT _numberRows = _pNumRows[_i];
                     auto _rowSizeBytes = static_cast<SIZE_T>(_pRowSizeInbytes[_i]);
 
-                    for (UINT _z = 0; _z = _numberSlice; ++_z)
+                    for (UINT _z = 0; _z < _numberSlice; ++_z)
                     {
                         BYTE* _pDestSlice = reinterpret_cast<BYTE*>(_cpyDesc.pData) + _cpyDesc.SlicePitch * _z;
 
@@ -901,7 +903,7 @@ bool NFDXRender::BuildBoxGeometry()
 
         // end barrier
         {
-            D3D12_RESOURCE_BARRIER _barrierDesc = {};
+            D3D12_RESOURCE_BARRIER _barrierDesc;
             ZeroMemory(&_barrierDesc, sizeof(_barrierDesc));
             _barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
             _barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -919,6 +921,113 @@ bool NFDXRender::BuildBoxGeometry()
 
     // create index GPU buffer and uploader
     {
+        // create GPU Buffer
+        {
+            D3D12_HEAP_PROPERTIES _heapProperties;
+            ZeroMemory(&_heapProperties, sizeof(_heapProperties));
+            _heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+            _heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            _heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+            _heapProperties.CreationNodeMask = 1;
+            _heapProperties.VisibleNodeMask = 1;
+
+            D3D12_RESOURCE_DESC _resourceDesc;
+            ZeroMemory(&_resourceDesc, sizeof(_resourceDesc));
+            _resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            _resourceDesc.Alignment = 0;
+            _resourceDesc.Width = _idByteSize;
+            _resourceDesc.Height = 1;
+            _resourceDesc.DepthOrArraySize = 1;
+            _resourceDesc.MipLevels = 1;
+            _resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+            _resourceDesc.SampleDesc.Count = 1;
+            _resourceDesc.SampleDesc.Quality = 0;
+            _resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            _resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+            mDevice->CreateCommittedResource(
+                &_heapProperties,
+                D3D12_HEAP_FLAG_NONE,
+                &_resourceDesc,
+                D3D12_RESOURCE_STATE_COMMON,
+                nullptr,
+                IID_PPV_ARGS(mBoxMesh->IndexBufferGPU.GetAddressOf())
+            );
+        }
+
+        // create Uploader
+        {
+            D3D12_HEAP_PROPERTIES _heapProperties;
+            ZeroMemory(&_heapProperties, sizeof(_heapProperties));
+            _heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+            _heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            _heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+            _heapProperties.CreationNodeMask = 1;
+            _heapProperties.VisibleNodeMask = 1;
+
+            D3D12_RESOURCE_DESC _resourceDesc;
+            ZeroMemory(&_resourceDesc, sizeof(_resourceDesc));
+            _resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            _resourceDesc.Alignment = 0;
+            _resourceDesc.Width = _idByteSize;
+            _resourceDesc.Height = 1;
+            _resourceDesc.DepthOrArraySize = 1;
+            _resourceDesc.MipLevels = 1;
+            _resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
+            _resourceDesc.SampleDesc.Count = 1;
+            _resourceDesc.SampleDesc.Quality = 0;
+            _resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            _resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+            ThrowIfFailed(
+                mDevice->CreateCommittedResource(
+                    &_heapProperties,
+                    D3D12_HEAP_FLAG_NONE,
+                    &_resourceDesc,
+                    D3D12_RESOURCE_STATE_GENERIC_READ,
+                    nullptr,
+                    IID_PPV_ARGS(mBoxMesh->IndexBufferUploader.GetAddressOf())
+                )
+            );
+        }
+
+        // begin barrier
+        {
+            D3D12_RESOURCE_BARRIER _barrierDesc;
+            ZeroMemory(&_barrierDesc, sizeof(_barrierDesc));
+            _barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+            _barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+            _barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
+            _barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+            _barrierDesc.Transition.pResource = mBoxMesh->IndexBufferGPU.Get();
+            _barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+            mCommandList->ResourceBarrier(
+                1,
+                &_barrierDesc
+            );
+        }
+
+        // update subresource
+        {
+        }
+
+        // end barrier
+        {
+            D3D12_RESOURCE_BARRIER _barrierDesc;
+            ZeroMemory(&_barrierDesc, sizeof(_barrierDesc));
+            _barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+            _barrierDesc.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+            _barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+            _barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+            _barrierDesc.Transition.pResource = mBoxMesh->IndexBufferGPU.Get();
+            _barrierDesc.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+            mCommandList->ResourceBarrier(
+                1,
+                &_barrierDesc
+            );
+        }
     }
 
     return true;
