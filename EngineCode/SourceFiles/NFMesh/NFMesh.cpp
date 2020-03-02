@@ -41,3 +41,17 @@ void NFMesh::AddSubGeometry( std::wstring const & targetName, UINT indexCount, U
 
     mSubMeshDataMap[targetName] = _subMesh;
 }
+
+
+NFSubmeshGeometry const* NFMesh::GetSubGeometry(std::wstring const & targetName)
+{
+    auto _targetIT = mSubMeshDataMap.find(targetName);
+    if(_targetIT == mSubMeshDataMap.end())
+    {
+        return nullptr;
+    }
+    else
+    {
+        return &_targetIT->second;
+    }
+}

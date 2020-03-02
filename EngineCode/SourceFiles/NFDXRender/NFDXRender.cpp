@@ -184,10 +184,8 @@ bool NFDXRender::Init(HWND targetHwnd)
 
     ThrowIfFailed(mCommandList->Reset(mCommandAllocator.Get(), nullptr));
 
-    // build constant buffer descriptor heaps
     ThrowIfFailed(!BuildCbvDescriptionHeaps());
 
-    // build constant buffer
     ThrowIfFailed(!BuildConstantBuffer());
 
     ThrowIfFailed(!BuildRootSignature());
@@ -436,7 +434,6 @@ bool NFDXRender::BuildConstantBuffer()
     D3D12_CONSTANT_BUFFER_VIEW_DESC _cbvDesc;
     _cbvDesc.BufferLocation = _cbAdress;
     _cbvDesc.SizeInBytes = _tempSize;
-
 
     mDevice->CreateConstantBufferView(
         &_cbvDesc,
@@ -1009,8 +1006,187 @@ bool NFDXRender::BuildBoxGeometry()
         }
 
         // update subresource
+        do
         {
+            UINT _numberOfSubresource = 1;
+            UINT _firstSubresource = 0;
+            UINT _baseOffset = 0;
+
+            UINT64 _requiredSize = 0;
+            UINT64 _memToAlloc = static_cast<UINT64>(
+                sizeof(D3D12_PLACED_SUBRESOURCE_FOOTPRINT) +
+                sizeof(UINT) +
+                sizeof(UINT64)
+            ) * _numberOfSubresource;
+
+            if (_memToAlloc > SIZE_MAX)
+            {
+                MessageBox(nullptr, L"Error", L"Allocate to large size !", MB_OK);
+
+                break;
+            }
+
+            void* _pAllocatedMemory = HeapAlloc(GetProcessHeap(), 0, static_cast<SIZE_T>(_memToAlloc));
+            if (_pAllocatedMemory == nullptr)
+            {
+                MessageBox(nullptr, L"Error", L"Allocate memory failed!", MB_OK);
+
+                break;
+            }
+
+            auto _pLayouts = reinterpret_cast<D3D12_PLACED_SUBRESOURCE_FOOTPRINT*>(_pAllocatedMemory);
+            auto _pRowSizeInbytes = reinterpret_cast<UINT64*>(_pLayouts + _numberOfSubresource);
+            auto _pNumRows = reinterpret_cast<UINT*>(_pRowSizeInbytes + _numberOfSubresource);
+
+            D3D12_RESOURCE_DESC _desc = mBoxMesh->IndexBufferGPU->GetDesc();
+
+            ID3D12Device* _pDevice = nullptr;
+
+            mBoxMesh->IndexBufferGPU->GetDevice(
+                __uuidof(*_pDevice),
+                reinterpret_cast<void**>(&_pDevice)
+            );
+
+            _pDevice->GetCopyableFootprints(
+                &_desc,
+                _firstSubresource,
+                _numberOfSubresource,
+                _baseOffset,
+                _pLayouts,
+                _pNumRows,
+                _pRowSizeInbytes,
+                &_requiredSize
+            );
+
+            _pDevice->Release();
+
+            // real upload subresource
+            {
+                D3D12_RESOURCE_DESC _uploaderDesc = mBoxMesh->IndexBufferUploader->GetDesc();
+                D3D12_RESOURCE_DESC _destinationDesc = mBoxMesh->IndexBufferGPU->GetDesc();
+
+                if (_uploaderDesc.Dimension != D3D12_RESOURCE_DIMENSION_BUFFER ||
+                    _uploaderDesc.Width < (_requiredSize + _pLayouts[0].Offset) ||
+                    _requiredSize > static_cast<SIZE_T>(-1) ||
+                    (_destinationDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER &&
+                        (_firstSubresource != 0 || _numberOfSubresource != 1)))
+                {
+                    MessageBox(nullptr, L"Error", L"Arguments error!", MB_OK);
+
+                    break;
+                }
+
+                BYTE* _pData = nullptr;
+
+                auto _tempResult = mBoxMesh->IndexBufferUploader->Map(
+                    0,
+                    nullptr,
+                    reinterpret_cast<void**>(&_pData)
+                );
+
+                if (FAILED(_tempResult))
+                {
+                    MessageBox(nullptr, L"Error", L"Map data failed!", MB_OK);
+
+                    break;
+                }
+
+                bool _showContinue = true;
+
+                D3D12_SUBRESOURCE_DATA _subresourceData = {};
+                _subresourceData.pData = _indices.data();
+                _subresourceData.RowPitch = _idByteSize;
+                _subresourceData.SlicePitch = _subresourceData.RowPitch;
+
+                for (UINT _i = 0; _i < _numberOfSubresource; ++_i)
+                {
+                    if (_pRowSizeInbytes[_i] > static_cast<SIZE_T>(-1))
+                    {
+                        _showContinue = false;
+
+                        break;
+                    }
+
+                    D3D12_MEMCPY_DEST _cpyDesc = {};
+                    ZeroMemory(&_cpyDesc, sizeof(_cpyDesc));
+                    _cpyDesc.pData = _pData + _pLayouts[_i].Offset;
+                    _cpyDesc.RowPitch = _pLayouts[_i].Footprint.RowPitch;
+                    _cpyDesc.SlicePitch = _pLayouts[_i].Footprint.RowPitch + _pNumRows[_i];
+
+                    UINT _numberSlice = _pLayouts[_i].Footprint.Depth;
+                    UINT _numberRows = _pNumRows[_i];
+                    auto _rowSizeBytes = static_cast<SIZE_T>(_pRowSizeInbytes[_i]);
+
+                    for (UINT _z = 0; _z < _numberSlice; ++_z)
+                    {
+                        BYTE* _pDestSlice = reinterpret_cast<BYTE*>(_cpyDesc.pData) + _cpyDesc.SlicePitch * _z;
+
+                        const BYTE* _pSrcSlice = reinterpret_cast<const BYTE*>(_subresourceData.pData) +
+                            _subresourceData.SlicePitch * _z;
+
+                        for (UINT _y = 0; _y < _numberRows; ++_y)
+                        {
+                            memcpy(
+                                _pDestSlice + _cpyDesc.RowPitch * _y,
+                                _pSrcSlice + _subresourceData.RowPitch * _y,
+                                _rowSizeBytes
+                            );
+                        }
+                    }
+                }
+
+                if (!_showContinue)
+                {
+                    MessageBox(nullptr, L"Error", L"Copy sub resource failed!", MB_OK);
+
+                    break;
+                }
+
+                mBoxMesh->IndexBufferUploader->Unmap(0, nullptr);
+
+                if (_destinationDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER)
+                {
+                    D3D12_BOX _boxDesc = {};
+                    ZeroMemory(&_boxDesc, sizeof(_boxDesc));
+                    _boxDesc.top = 0;
+                    _boxDesc.front = 0;
+                    _boxDesc.bottom = 1;
+                    _boxDesc.back = 1;
+                    _boxDesc.left = static_cast<UINT>(_pLayouts[0].Offset);
+                    _boxDesc.right = static_cast<UINT>(_pLayouts[0].Offset + _pLayouts[0].Footprint.Width);
+
+                    mCommandList->CopyBufferRegion(
+                        mBoxMesh->IndexBufferGPU.Get(),
+                        0,
+                        mBoxMesh->IndexBufferUploader.Get(),
+                        _pLayouts[0].Offset,
+                        _pLayouts[0].Footprint.Width
+                    );
+                }
+                else
+                {
+                    for (UINT _i = 0; _i < _numberOfSubresource; ++_i)
+                    {
+                        D3D12_TEXTURE_COPY_LOCATION _dest = {};
+                        ZeroMemory(&_dest, sizeof(_dest));
+                        _dest.pResource = mBoxMesh->IndexBufferGPU.Get();
+                        _dest.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+                        _dest.SubresourceIndex = _i + _baseOffset;
+
+                        D3D12_TEXTURE_COPY_LOCATION _src = {};
+                        ZeroMemory(&_src, sizeof(_src));
+                        _src.pResource = mBoxMesh->IndexBufferUploader.Get();
+                        _src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+                        _src.PlacedFootprint = _pLayouts[0];
+
+                        mCommandList->CopyTextureRegion(&_dest, 0, 0, 0, &_src, nullptr);
+                    }
+                }
+            }
+
+            HeapFree(GetProcessHeap(), 0, _pAllocatedMemory);
         }
+        while (false);
 
         // end barrier
         {
@@ -1029,6 +1205,19 @@ bool NFDXRender::BuildBoxGeometry()
             );
         }
     }
+
+    mBoxMesh->VertexByteStride = sizeof(NFVertex);
+
+    mBoxMesh->VertexBufferByteSize = _vbByteSize;
+
+    mBoxMesh->IndexBufferByteSize = _idByteSize;
+
+    mBoxMesh->AddSubGeometry(
+        L"BoxMesh",
+        static_cast<UINT>(_indices.size()),
+        0,
+        0
+    );
 
     return true;
 }
@@ -1152,8 +1341,13 @@ bool NFDXRender::Render()
 {
     ThrowIfFailed(mCommandAllocator->Reset());
 
-    ThrowIfFailed(mCommandList->Reset( mCommandAllocator.Get(), nullptr ));
+    ThrowIfFailed(mCommandList->Reset( mCommandAllocator.Get(), mPipeLineState.Get()));
 
+    mCommandList->RSSetViewports(1, &mScreenViewport);
+
+    mCommandList->RSSetScissorRects(1, &mScissorRect);
+
+    // start barrier
     {
         D3D12_RESOURCE_BARRIER _desc;
 
@@ -1167,13 +1361,9 @@ bool NFDXRender::Render()
         mCommandList->ResourceBarrier(1, &_desc);
     }
 
-    mCommandList->RSSetViewports(1, &mScreenViewport);
-
-    mCommandList->RSSetScissorRects(1, &mScissorRect);
-
     mCommandList->ClearRenderTargetView(
         CurrentBackBufferView(),
-        DirectX::Colors::Gray,
+        DirectX::Colors::Silver,
         0,
         nullptr
     );
@@ -1194,6 +1384,33 @@ bool NFDXRender::Render()
         &DepthStencilView()
     );
 
+    ID3D12DescriptorHeap* _descriptorHeaps[] = {mCbvHeap.Get()};
+
+    auto _countOfHeaps = static_cast<UINT>(_countof(_descriptorHeaps));
+
+    mCommandList->SetDescriptorHeaps(_countOfHeaps, _descriptorHeaps);
+
+    mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
+
+    mCommandList->IASetVertexBuffers(0, 1, &mBoxMesh->VertexBufferView());
+
+    mCommandList->IASetIndexBuffer(&mBoxMesh->IndexBufferView());
+
+    mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    mCommandList->SetGraphicsRootDescriptorTable(0, mCbvHeap->GetGPUDescriptorHandleForHeapStart());
+
+    auto _indexCount = mBoxMesh->GetSubGeometry(L"BoxMesh")->IndexCount;
+
+    mCommandList->DrawIndexedInstanced(
+        _indexCount,
+        1,
+        0,
+        0,
+        0
+    );
+
+    // end barrier
     {
         D3D12_RESOURCE_BARRIER _desc;
 

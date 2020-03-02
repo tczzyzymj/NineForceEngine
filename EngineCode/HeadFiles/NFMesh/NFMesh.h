@@ -104,6 +104,9 @@ public:
     );
 
 
+    NFSubmeshGeometry const* GetSubGeometry(std::wstring const & targetName);
+
+
 private:
 
     std::wstring mName;
