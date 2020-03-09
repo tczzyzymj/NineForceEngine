@@ -38,8 +38,9 @@ bool NFWindow::InitD3D()
 }
 
 
-void NFWindow::Update()
+void NFWindow::Update(float deltaTime)
 {
+    mDXRender->Update(deltaTime);
 }
 
 
@@ -57,9 +58,9 @@ int NFWindow::Run()
         }
         else
         {
-            Update();
+            Update(0);
 
-            Render();
+            Render(0);
         }
     }
 
@@ -67,7 +68,7 @@ int NFWindow::Run()
 }
 
 
-void NFWindow::Render()
+void NFWindow::Render(float deltaTime)
 {
     if (mDXRender == nullptr)
     {

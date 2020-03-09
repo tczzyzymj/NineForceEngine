@@ -19,13 +19,14 @@ public:
     bool InitD3D();
 
 
-    void Update();
+    void Update(float deltaTime);
+
+
+    void Render(float deltaTime);
 
 
     int Run();
 
-
-    void Render();
 
     void OnResize();
 

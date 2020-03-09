@@ -61,7 +61,7 @@ public :
             mUploadBuffer->Map(
                 0,
                 nullptr,
-                reinterpret_cast<void**>(mMappedData)
+                reinterpret_cast<void**>(&mMappedData)
             )
         );
     }
@@ -87,6 +87,12 @@ public :
     ID3D12Resource* Resource() const
     {
         return mUploadBuffer.Get();
+    }
+
+
+    void CopyData(int elementIndex, const T& sourceData)
+    {
+        memcpy(&mMappedData[elementIndex * mElementSize], &sourceData, sizeof(T));
     }
 
 

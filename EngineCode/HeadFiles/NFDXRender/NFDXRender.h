@@ -33,6 +33,9 @@ public:
     NFDXRender();
 
 
+    void Update(float deltaTime);
+
+
     bool Init(HWND targetHwnd);
 
 
@@ -180,4 +183,21 @@ private:
 
 
     std::unique_ptr<NFMesh> mBoxMesh;
+
+
+    DirectX::XMFLOAT4X4 mWorld;
+
+
+    DirectX::XMFLOAT4X4 mView;
+
+
+    DirectX::XMFLOAT4X4 mProj;
+
+    float mTheta = 1.5f * 3.141592654f;
+
+
+    float mPhi = 0.785398163f;
+
+
+    float mRadius = 5.0f;
 };

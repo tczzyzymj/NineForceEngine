@@ -12,6 +12,88 @@ using namespace DirectX;
 
 NFDXRender::NFDXRender()
 {
+    mView = DirectX::XMFLOAT4X4(
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f
+    );
+
+    mWorld = DirectX::XMFLOAT4X4(
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f
+    );
+
+    mProj = DirectX::XMFLOAT4X4(
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f
+    );
+}
+
+
+void NFDXRender::Update(float deltaTime)
+{
+    float x = mRadius * sinf(mPhi) * cosf(mTheta);
+    float z = mRadius * sinf(mPhi) * sinf(mTheta);
+    float y = mRadius * cosf(mPhi);
+
+    // Build the view matrix.
+    XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+    XMVECTOR target = XMVectorZero();
+    XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+    XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
+    XMStoreFloat4x4(&mView, view);
+
+    XMMATRIX world = XMLoadFloat4x4(&mWorld);
+    XMMATRIX proj = XMLoadFloat4x4(&mProj);
+    XMMATRIX worldViewProj = world * view * proj;
+
+    // Update the constant buffer with the latest worldViewProj matrix.
+    NFObjectConstants _constantData;
+    XMStoreFloat4x4(&_constantData.WorldViewProj, XMMatrixTranspose(worldViewProj));
+
+    mObjCB->CopyData(0, _constantData);
 }
 
 
@@ -1571,6 +1653,11 @@ bool NFDXRender::OnResize()
         static_cast<LONG>(NFSetting::Ins().GetClientWidth()),
         static_cast<LONG>(NFSetting::Ins().GetClientHeight())
     };
+
+    float _aspectRatio = static_cast<float>(NFSetting::Ins().GetClientWidth()) / NFSetting::Ins().GetClientHeight();
+
+    XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * 3.1415926535f, _aspectRatio, 1.0f, 1000.0f);
+    XMStoreFloat4x4(&mProj, P);
 
     return true;
 }
