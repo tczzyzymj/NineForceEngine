@@ -15,6 +15,8 @@ NFWindow::NFWindow(HINSTANCE hIns) : mIns(hIns)
 NFWindow* NFWindow::mNFWindow = nullptr;
 
 
+// CALLBACK __stdcall 被这个关键字修饰的函数，其参数都是从右向左通过堆栈传递的(__fastcall 的前面部分由ecx,edx传)，
+// 函数调用在返回前要由被调用者清理堆栈。
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     auto _window = NFWindow::GetWindowPtr();
@@ -115,6 +117,13 @@ bool NFWindow::Init()
 
     if (_window == nullptr)
     {
+        MessageBox(
+            nullptr,
+            L"Window is empty, Please check!",
+            L"Error",
+            MB_OK
+        );
+
         return false;
     }
 
